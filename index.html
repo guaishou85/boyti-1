@@ -1,495 +1,477 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="dark">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>BroTi · 直男人格检测</title>
-    <meta name="description" content="测测你的直男人格成分，一份带点黑色幽默的自我观察报告。">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BroTi · 直男人格测试</title>
+    <meta name="description" content="20道题，一次性回答，精准剖析你的直男人格成分。">
     
-    <!-- Tailwind CSS + DaisyUI (通过 CDN) -->
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@4/full.css" rel="stylesheet" type="text/css" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- html2canvas 用于生成结果图片 -->
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- html2canvas -->
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     
-    <!-- 字体与基础样式 -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 40%, #0f172a 100%);
+            background: linear-gradient(145deg, #f5f7fe 0%, #e9eef8 100%);
             min-height: 100vh;
+            padding: 2rem 0;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        [data-bs-theme="dark"] body {
+            background: linear-gradient(145deg, #0b1120 0%, #192132 100%);
         }
-        .animate-fade-in {
-            animation: fadeIn 0.4s ease-out;
+        .card-test {
+            border: none;
+            border-radius: 28px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 20px 40px -12px rgba(0, 20, 60, 0.15);
+            transition: transform 0.2s;
         }
-        .option-card {
-            transition: all 0.2s ease;
+        [data-bs-theme="dark"] .card-test {
+            background: rgba(20, 30, 50, 0.7);
+            box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.5);
+            color: #eef2fb;
         }
-        .option-card:hover {
-            transform: translateX(4px);
+        .question-card {
+            border-radius: 20px;
+            background: rgba(255,255,255,0.5);
+            border: 1px solid rgba(255,255,255,0.8);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            backdrop-filter: blur(4px);
         }
-        /* 结果头像占位样式 */
-        .avatar-placeholder {
-            background: linear-gradient(145deg, #2a3a5c, #1a2a4c);
+        [data-bs-theme="dark"] .question-card {
+            background: rgba(30, 40, 60, 0.6);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .option-btn {
+            border-radius: 60px !important;
+            padding: 0.75rem 1.5rem !important;
+            font-weight: 500;
+            transition: all 0.2s;
+            border: 1.5px solid transparent;
+            background: rgba(255,255,255,0.6);
+            color: #1a2b4c;
+            text-align: left;
+            width: 100%;
+            margin-bottom: 0.75rem;
+            backdrop-filter: blur(4px);
+        }
+        [data-bs-theme="dark"] .option-btn {
+            background: rgba(255,255,255,0.05);
+            color: #d0daf0;
+            border-color: rgba(255,255,255,0.1);
+        }
+        .option-btn:hover {
+            background: rgba(99, 102, 241, 0.08);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+        .option-btn.selected {
+            background: #4f46e5 !important;
+            border-color: #4f46e5 !important;
+            color: white !important;
+            box-shadow: 0 8px 18px -6px rgba(79, 70, 229, 0.4);
+        }
+        [data-bs-theme="dark"] .option-btn.selected {
+            background: #6366f1 !important;
+            border-color: #6366f1 !important;
+            color: white !important;
+        }
+        .result-avatar {
+            width: 140px;
+            height: 140px;
             border-radius: 50%;
+            background: linear-gradient(145deg, #4f46e5, #7c3aed);
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 16px 30px -8px rgba(79, 70, 229, 0.3);
+        }
+        .progress-custom {
+            height: 8px;
+            border-radius: 20px;
+            background-color: rgba(0,0,0,0.05);
+        }
+        [data-bs-theme="dark"] .progress-custom {
+            background-color: rgba(255,255,255,0.1);
+        }
+        .badge-type {
+            background: #e0e7ff;
+            color: #3730a3;
+            font-weight: 600;
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+        }
+        [data-bs-theme="dark"] .badge-type {
+            background: #312e81;
+            color: #c7d2fe;
+        }
+        .btn-gradient {
+            background: linear-gradient(145deg, #4f46e5, #7c3aed);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 0.9rem 2rem;
+            border-radius: 60px;
+            transition: 0.2s;
+            box-shadow: 0 8px 20px -8px #4f46e5;
+        }
+        .btn-gradient:hover {
+            background: linear-gradient(145deg, #4338ca, #6d28d9);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 14px 26px -8px #4f46e5;
+        }
+        .btn-outline-light-custom {
+            border: 1.5px solid rgba(0,0,0,0.1);
+            border-radius: 60px;
+            padding: 0.9rem 2rem;
+            font-weight: 500;
+            background: transparent;
+        }
+        [data-bs-theme="dark"] .btn-outline-light-custom {
+            border-color: rgba(255,255,255,0.2);
+            color: #e0e7ff;
+        }
+        .footer-note {
+            color: #64748b;
+        }
+        [data-bs-theme="dark"] .footer-note {
+            color: #94a3b8;
+        }
+        /* 主题切换按钮 */
+        .theme-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 48px;
+            height: 48px;
+            border-radius: 30px;
+            background: white;
+            border: none;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            z-index: 1000;
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center p-4 md:p-6 font-sans antialiased">
+<body data-bs-theme="light">
 
-    <div id="app" class="w-full max-w-4xl mx-auto flex flex-col items-center">
-        <!-- 动态内容渲染区 -->
+    <!-- 简单的主题切换按钮 (浅色/深色) -->
+    <button class="theme-toggle btn btn-light rounded-5 shadow" id="themeToggle">
+        <i class="bi bi-moon-stars-fill"></i>
+    </button>
+
+    <div id="app" class="container py-3 py-md-5">
+        <!-- 动态内容渲染 -->
     </div>
 
     <script>
-        // ---------- 题库数据 ----------
-        const QUESTION_BANK = [
-            {
-                id: 1,
-                text: "周末下午，你更倾向于怎么过？",
-                options: [
-                    { text: "约兄弟开黑或者打球，人越多越热闹", desc: "能量来自于外界", trait: "E", weight: 1 },
-                    { text: "宅家打游戏/看番/刷手机，享受独处", desc: "能量来自于独处", trait: "I", weight: 1 }
-                ]
-            },
-            {
-                id: 2,
-                text: "女朋友问你“我是不是胖了”，你的第一反应是？",
-                options: [
-                    { text: "上下打量一番，认真回答：“好像是胖了点，最近少吃点？”", desc: "基于事实", trait: "S", weight: 1 },
-                    { text: "立刻警觉：“没有没有，你怎么样都好看，我们去吃好吃的吧！”", desc: "基于直觉/情绪", trait: "N", weight: 1 }
-                ]
-            },
-            {
-                id: 3,
-                text: "兄弟找你借钱，但你知道他最近沉迷氪金手游，你会？",
-                options: [
-                    { text: "先问清楚用途，评估他能不能还，再决定借不借", desc: "理性分析", trait: "T", weight: 1 },
-                    { text: "觉得兄弟开口了不容易，能力范围内尽量帮一把", desc: "情感优先", trait: "F", weight: 1 }
-                ]
-            },
-            {
-                id: 4,
-                text: "出门旅游，你习惯？",
-                options: [
-                    { text: "提前做好详细攻略，酒店景点路线都定好", desc: "计划性强", trait: "J", weight: 1 },
-                    { text: "只订好机票酒店，剩下的到了再说，随缘逛", desc: "随性灵活", trait: "P", weight: 1 }
-                ]
-            },
-            {
-                id: 5,
-                text: "遇到一个很复杂的电器问题，你倾向于？",
-                options: [
-                    { text: "自己动手，拆开研究，看说明书/查视频", desc: "动手实干", trait: "S", weight: 1 },
-                    { text: "先想想原理，画个草图，再决定怎么下手", desc: "理论先行", trait: "N", weight: 1 }
-                ]
-            },
-            {
-                id: 6,
-                text: "朋友聚会时，你通常是？",
-                options: [
-                    { text: "气氛组，带动话题，聊个不停", desc: "外向", trait: "E", weight: 1 },
-                    { text: "安静听大家说，偶尔插几句", desc: "内向", trait: "I", weight: 1 }
-                ]
-            },
-            {
-                id: 7,
-                text: "工作中和同事有分歧，你更看重？",
-                options: [
-                    { text: "谁的想法更符合逻辑、更高效", desc: "对事不对人", trait: "T", weight: 1 },
-                    { text: "谁的态度更诚恳，不影响团队和谐", desc: "照顾情绪", trait: "F", weight: 1 }
-                ]
-            },
-            {
-                id: 8,
-                text: "你的桌面/电脑文件通常是？",
-                options: [
-                    { text: "井井有条，分门别类", desc: "秩序感", trait: "J", weight: 1 },
-                    { text: "看似混乱，但自己知道东西在哪", desc: "随意感", trait: "P", weight: 1 }
-                ]
-            }
-        ];
+        (function(){
+            'use strict';
 
-        // ---------- 结果类型库 (包含 CSS 头像占位) ----------
-        const RESULT_TYPES = [
-            {
-                code: "ESTJ",
-                name: "钢铁司令官",
-                subtitle: "秩序守护者",
-                description: "你天生就是当领导的料，做事雷厉风行，原则性强。在你看来，世界就应该按照规则运转。兄弟找你帮忙，你会先问清楚前因后果；女朋友生气，你会试图用逻辑说服她（然后火上浇油）。你的直男癌指数不低，但靠谱程度极高。",
-                traits: { straightScore: 88, straightComment: "直来直去", eqScore: 35, eqComment: "需要多哄哄" },
-                avatarEmoji: "👨‍✈️",
-                avatarColor: "#3b5998"
-            },
-            {
-                code: "ISTJ",
-                name: "沉默质检员",
-                subtitle: "细节偏执狂",
-                description: "你是最可靠的执行者，沉默寡言但内心自有丘壑。你觉得花言巧语不如把事做好。女朋友问你新发型怎么样，你会认真端详后说：“左边比右边长了3毫米。”你的认真是一种别样的魅力，但有时候真的会气死人。",
-                traits: { straightScore: 92, straightComment: "直线思维", eqScore: 28, eqComment: "凭实力单身" },
-                avatarEmoji: "🔍",
-                avatarColor: "#4a5568"
-            },
-            {
-                code: "ESFJ",
-                name: "暖心老大哥",
-                subtitle: "妇女之友",
-                description: "你是团队里的粘合剂，热情、细心、照顾每个人的感受。你记得住兄弟的生日、女朋友的喜好，出门吃饭永远是你点菜。但有时候过于在意别人的看法，活得有点累。你的直男指数很低，堪称男性楷模。",
-                traits: { straightScore: 25, straightComment: "暖男本男", eqScore: 95, eqComment: "中央空调级别" },
-                avatarEmoji: "🤗",
-                avatarColor: "#e67e22"
-            },
-            {
-                code: "ISFJ",
-                name: "温柔守护者",
-                subtitle: "默默付出型",
-                description: "你就像一杯温水，不烫不凉，但最解渴。你不善言辞，但会把关心藏在行动里。下雨天你会默默去接她，兄弟喝多了你会负责送回家。你的直男表现就是：永远在做事，永远不会说情话。",
-                traits: { straightScore: 55, straightComment: "行动派", eqScore: 80, eqComment: "润物细无声" },
-                avatarEmoji: "🛡️",
-                avatarColor: "#27ae60"
-            },
-            {
-                code: "ESTP",
-                name: "社交悍匪",
-                subtitle: "全场最靓的仔",
-                description: "你胆大心细，享受刺激，是聚会上最会玩的人。撩妹技能点满，但也容易因为过于随性而显得不靠谱。兄弟有难你第一个上，女朋友生气你第一个跪。你的直男指数波动很大，取决于你当时的心情。",
-                traits: { straightScore: 60, straightComment: "直率", eqScore: 75, eqComment: "见人说人话" },
-                avatarEmoji: "😎",
-                avatarColor: "#f1c40f"
-            },
-            {
-                code: "ISTP",
-                name: "高冷手艺人",
-                subtitle: "人狠话不多",
-                description: "你是行走的工具箱，修电脑、换灯泡、组装家具无所不能。你觉得能用行动解决的事，绝不多BB。女朋友跟你抱怨工作累，你会直接问：“需要我给你重装系统吗？”——虽然搞错了方向，但手艺活真的没得说。",
-                traits: { straightScore: 90, straightComment: "工具人属性", eqScore: 20, eqComment: "别让我猜" },
-                avatarEmoji: "🔧",
-                avatarColor: "#7f8c8d"
-            },
-            {
-                code: "ESFP",
-                name: "人间小太阳",
-                subtitle: "快乐源泉",
-                description: "你是天生的表演家，有你的地方就有欢笑。你喜欢尝试新鲜事物，对世界充满好奇。虽然有时候做事三分钟热度，但你的乐观总能感染身边的人。直男？不存在的，你比女生还会玩。",
-                traits: { straightScore: 15, straightComment: "姐妹相称", eqScore: 98, eqComment: "气氛组担当" },
-                avatarEmoji: "🎉",
-                avatarColor: "#e84393"
-            },
-            {
-                code: "ISFP",
-                name: "文艺闷骚男",
-                subtitle: "内心有片海",
-                description: "你外表安静，内心却有着丰富的艺术细胞和感受力。你不喜欢冲突，追求和谐。在女生眼里，你有一种神秘的吸引力。但有时候过于被动和敏感，让人摸不透你在想什么。直男指数极低，但容易陷入自己的小世界。",
-                traits: { straightScore: 20, straightComment: "细腻敏感", eqScore: 85, eqComment: "懂得倾听" },
-                avatarEmoji: "🎨",
-                avatarColor: "#6c5ce7"
-            },
-            {
-                code: "ENTJ",
-                name: "霸道总裁",
-                subtitle: "天生的王者",
-                description: "你有极强的野心和控制欲，目标明确，行动力爆表。在你的字典里，没有“不可能”三个字。你喜欢掌控全局，也包括你的另一半。虽然你很大男子主义，但跟着你确实有肉吃。你的直男癌是那种“我不要你觉得，我要我觉得”的类型。",
-                traits: { straightScore: 85, straightComment: "霸道", eqScore: 40, eqComment: "爱你才管你" },
-                avatarEmoji: "👑",
-                avatarColor: "#c0392b"
-            },
-            {
-                code: "INTJ",
-                name: "幕后黑手",
-                subtitle: "独立思考者",
-                description: "你是完美的策略家，理性、冷静、有远见。你习惯独处，享受思考的乐趣。在别人眼里你可能有点高冷甚至孤僻，但你根本不在乎。你对另一半的要求是：聪明、独立、别来烦我。你的直男表现就是：用思维导图分析感情问题。",
-                traits: { straightScore: 95, straightComment: "理智到冷漠", eqScore: 15, eqComment: "感情是啥" },
-                avatarEmoji: "♟️",
-                avatarColor: "#2c3e50"
-            },
-            {
-                code: "ENTP",
-                name: "嘴强王者",
-                subtitle: "逻辑鬼才",
-                description: "你聪明、机智、热衷于辩论。你享受智力上的交锋，而不是情感上的共鸣。女朋友生气，你会兴致勃勃地跟她复盘整件事的逻辑漏洞，然后成功把她气哭。虽然你嘴很欠，但脑子是真的好使，总能想出奇妙的点子。",
-                traits: { straightScore: 80, straightComment: "杠精本精", eqScore: 30, eqComment: "赢了道理输了人" },
-                avatarEmoji: "🤓",
-                avatarColor: "#d35400"
-            },
-            {
-                code: "INTP",
-                name: "理论科学家",
-                subtitle: "脑洞星人",
-                description: "你生活在自己的逻辑世界里，对一切事物都充满好奇。你不修边幅，对外界事物反应迟钝。女朋友暗示你想喝奶茶，你会认真分析奶茶的成分和人体摄入糖分的利弊。你的直男表现堪称教科书级别的“不解风情”。",
-                traits: { straightScore: 98, straightComment: "榆木疙瘩", eqScore: 10, eqComment: "注孤生潜力股" },
-                avatarEmoji: "🧪",
-                avatarColor: "#8e44ad"
-            },
-            {
-                code: "ENFJ",
-                name: "灵魂导师",
-                subtitle: "精神领袖",
-                description: "你富有魅力，善于鼓舞人心，是天生的教育家。你总能敏锐地察觉到他人的情绪变化，并给予支持。你是很多女生的“男闺蜜”，因为太懂她们了。你的直男指数很低，但有时候因为太爱说教，会显得有点爹味。",
-                traits: { straightScore: 30, straightComment: "知心大哥", eqScore: 95, eqComment: "共情能力MAX" },
-                avatarEmoji: "📖",
-                avatarColor: "#16a085"
-            },
-            {
-                code: "INFJ",
-                name: "神秘主义者",
-                subtitle: "理想主义战士",
-                description: "你有着深刻的洞察力和坚定的价值观。你外表温和，内心却有一团火。你追求灵魂伴侣，对感情宁缺毋滥。虽然你看起来很直，但实际上心思细腻，只是懒得跟不熟的人废话。你有一套自己的处世哲学。",
-                traits: { straightScore: 40, straightComment: "外冷内热", eqScore: 90, eqComment: "灵魂洞察者" },
-                avatarEmoji: "🔮",
-                avatarColor: "#2980b9"
-            },
-            {
-                code: "ENFP",
-                name: "快乐小狗",
-                subtitle: "社交牛逼症",
-                description: "你热情、奔放、充满好奇心，是行走的正能量发射器。你对每个人都很好，以至于女朋友经常吃醋。你的脑洞很大，上一秒还在聊工作，下一秒就能跳到外星人。直男？你比女生还感性，看个广告都能哭。",
-                traits: { straightScore: 10, straightComment: "感性动物", eqScore: 98, eqComment: "人见人爱" },
-                avatarEmoji: "🐶",
-                avatarColor: "#f39c12"
-            },
-            {
-                code: "INFP",
-                name: "治愈系少年",
-                subtitle: "永远的梦想家",
-                description: "你温柔、善良、富有同情心，内心住着一个纯真的小孩。你对世界有着美好的憧憬，虽然有时候显得有点不切实际。你非常在意他人的感受，是很好的倾听者。你的直男指数为零，因为你本身就是个需要被呵护的宝宝。",
-                traits: { straightScore: 5, straightComment: "小仙男", eqScore: 99, eqComment: "人间天使" },
-                avatarEmoji: "🌸",
-                avatarColor: "#9b59b6"
-            }
-        ];
+            // ---------- 20题题库 (男生向) ----------
+            const QUESTION_BANK = [
+                { id: 1, text: "周末下午，你更倾向于怎么过？", options: [{ text: "约兄弟开黑或者打球，人越多越热闹", trait: "E" }, { text: "宅家打游戏/看番/刷手机，享受独处", trait: "I" }] },
+                { id: 2, text: "朋友聚会时，你通常是？", options: [{ text: "气氛组，带动话题，聊个不停", trait: "E" }, { text: "安静听大家说，偶尔插几句", trait: "I" }] },
+                { id: 3, text: "在社交场合认识新朋友，你感觉？", options: [{ text: "很兴奋，能快速和人聊起来", trait: "E" }, { text: "有点累，更喜欢和一两个熟人深聊", trait: "I" }] },
+                { id: 4, text: "工作/学习累了，你更想？", options: [{ text: "找朋友出去吃顿好的，聊聊天", trait: "E" }, { text: "一个人静静，看部电影或听歌", trait: "I" }] },
+                { id: 5, text: "你更倾向于哪种沟通方式？", options: [{ text: "直接打电话或语音，快速交流", trait: "E" }, { text: "发文字消息，有思考的时间", trait: "I" }] },
+                { id: 6, text: "女朋友问你“我是不是胖了”，你的第一反应是？", options: [{ text: "上下打量一番，认真回答：“好像是胖了点，最近少吃点？”", trait: "S" }, { text: "立刻警觉：“没有没有，你怎么样都好看！”", trait: "N" }] },
+                { id: 7, text: "遇到一个复杂的电器问题，你倾向于？", options: [{ text: "自己动手，拆开研究，看说明书/查视频", trait: "S" }, { text: "先想想原理，画个草图，再决定怎么下手", trait: "N" }] },
+                { id: 8, text: "你更欣赏哪种类型的电影？", options: [{ text: "基于真实事件改编，或者纪录片", trait: "S" }, { text: "科幻、奇幻，充满想象力的世界", trait: "N" }] },
+                { id: 9, text: "学习新技能时，你通常？", options: [{ text: "按照教程一步步操作，注重细节", trait: "S" }, { text: "先理解整体框架和概念，再动手", trait: "N" }] },
+                { id: 10, text: "朋友讲了一个笑话，你更在意？", options: [{ text: "笑话本身好不好笑，逻辑是否通顺", trait: "S" }, { text: "笑话背后的讽刺意味或者脑洞", trait: "N" }] },
+                { id: 11, text: "兄弟找你借钱，但你知道他最近沉迷氪金手游，你会？", options: [{ text: "先问清楚用途，评估他能不能还，再决定", trait: "T" }, { text: "觉得兄弟开口了不容易，能力范围内帮一把", trait: "F" }] },
+                { id: 12, text: "工作中和同事有分歧，你更看重？", options: [{ text: "谁的想法更符合逻辑、更高效", trait: "T" }, { text: "谁的态度更诚恳，不影响团队和谐", trait: "F" }] },
+                { id: 13, text: "看到感人的电影情节，你会？", options: [{ text: "心里有点触动，但表面很平静", trait: "T" }, { text: "眼眶湿润，甚至偷偷抹眼泪", trait: "F" }] },
+                { id: 14, text: "朋友向你倾诉烦恼，你第一反应是？", options: [{ text: "帮他分析问题，给出解决方案", trait: "T" }, { text: "先安慰情绪，表示理解和支持", trait: "F" }] },
+                { id: 15, text: "你认为在团队中，什么更重要？", options: [{ text: "公平公正，按规则办事", trait: "T" }, { text: "大家相处融洽，关系和谐", trait: "F" }] },
+                { id: 16, text: "出门旅游，你习惯？", options: [{ text: "提前做好详细攻略，酒店景点路线都定好", trait: "J" }, { text: "只订好机票酒店，剩下的到了再说", trait: "P" }] },
+                { id: 17, text: "你的桌面/电脑文件通常是？", options: [{ text: "井井有条，分门别类", trait: "J" }, { text: "看似混乱，但自己知道东西在哪", trait: "P" }] },
+                { id: 18, text: "面对一个 deadline 临近的任务，你通常会？", options: [{ text: "早早规划，按部就班完成", trait: "J" }, { text: "前期放松，最后时刻爆发冲刺", trait: "P" }] },
+                { id: 19, text: "对于计划和变化，你的态度是？", options: [{ text: "喜欢按计划行事，讨厌被打乱", trait: "J" }, { text: "计划赶不上变化，灵活应对", trait: "P" }] },
+                { id: 20, text: "购物时，你更倾向于？", options: [{ text: "列好清单，直奔目标，买完就走", trait: "J" }, { text: "随意逛逛，看到喜欢的再买", trait: "P" }] }
+            ];
 
-        // ---------- 应用状态 ----------
-        const app = document.getElementById('app');
-        let currentView = 'home';
-        let currentQuestionIndex = 0;
-        let answers = [];
-        let finalType = null;
+            // 结果类型库 (头像用 Emoji + 渐变)
+            const RESULT_TYPES = [
+                { code: "ESTJ", name: "钢铁司令官", subtitle: "秩序守护者", description: "你天生就是当领导的料，做事雷厉风行，原则性强。你的直男癌指数不低，但靠谱程度极高。", traits: { straightScore: 88, straightComment: "直来直去", eqScore: 35, eqComment: "需要多哄哄" }, avatarEmoji: "👨‍✈️", avatarColor: "#3b5998" },
+                { code: "ISTJ", name: "沉默质检员", subtitle: "细节偏执狂", description: "你是最可靠的执行者，沉默寡言但内心自有丘壑。你的认真是一种别样的魅力，但有时候真的会气死人。", traits: { straightScore: 92, straightComment: "直线思维", eqScore: 28, eqComment: "凭实力单身" }, avatarEmoji: "🔍", avatarColor: "#4a5568" },
+                { code: "ESFJ", name: "暖心老大哥", subtitle: "妇女之友", description: "你是团队里的粘合剂，热情、细心、照顾每个人的感受。你的直男指数很低，堪称男性楷模。", traits: { straightScore: 25, straightComment: "暖男本男", eqScore: 95, eqComment: "中央空调级别" }, avatarEmoji: "🤗", avatarColor: "#e67e22" },
+                { code: "ISFJ", name: "温柔守护者", subtitle: "默默付出型", description: "你就像一杯温水，不烫不凉，但最解渴。你的直男表现就是：永远在做事，永远不会说情话。", traits: { straightScore: 55, straightComment: "行动派", eqScore: 80, eqComment: "润物细无声" }, avatarEmoji: "🛡️", avatarColor: "#27ae60" },
+                { code: "ESTP", name: "社交悍匪", subtitle: "全场最靓的仔", description: "你胆大心细，享受刺激，是聚会上最会玩的人。你的直男指数波动很大，取决于你当时的心情。", traits: { straightScore: 60, straightComment: "直率", eqScore: 75, eqComment: "见人说人话" }, avatarEmoji: "😎", avatarColor: "#f1c40f" },
+                { code: "ISTP", name: "高冷手艺人", subtitle: "人狠话不多", description: "你是行走的工具箱，修电脑、换灯泡、组装家具无所不能。女朋友跟你抱怨工作累，你会直接问：“需要我给你重装系统吗？”", traits: { straightScore: 90, straightComment: "工具人属性", eqScore: 20, eqComment: "别让我猜" }, avatarEmoji: "🔧", avatarColor: "#7f8c8d" },
+                { code: "ESFP", name: "人间小太阳", subtitle: "快乐源泉", description: "你是天生的表演家，有你的地方就有欢笑。直男？不存在的，你比女生还会玩。", traits: { straightScore: 15, straightComment: "姐妹相称", eqScore: 98, eqComment: "气氛组担当" }, avatarEmoji: "🎉", avatarColor: "#e84393" },
+                { code: "ISFP", name: "文艺闷骚男", subtitle: "内心有片海", description: "你外表安静，内心却有着丰富的艺术细胞和感受力。直男指数极低，但容易陷入自己的小世界。", traits: { straightScore: 20, straightComment: "细腻敏感", eqScore: 85, eqComment: "懂得倾听" }, avatarEmoji: "🎨", avatarColor: "#6c5ce7" },
+                { code: "ENTJ", name: "霸道总裁", subtitle: "天生的王者", description: "你有极强的野心和控制欲，目标明确，行动力爆表。你的直男癌是那种“我不要你觉得，我要我觉得”的类型。", traits: { straightScore: 85, straightComment: "霸道", eqScore: 40, eqComment: "爱你才管你" }, avatarEmoji: "👑", avatarColor: "#c0392b" },
+                { code: "INTJ", name: "幕后黑手", subtitle: "独立思考者", description: "你是完美的策略家，理性、冷静、有远见。你的直男表现就是：用思维导图分析感情问题。", traits: { straightScore: 95, straightComment: "理智到冷漠", eqScore: 15, eqComment: "感情是啥" }, avatarEmoji: "♟️", avatarColor: "#2c3e50" },
+                { code: "ENTP", name: "嘴强王者", subtitle: "逻辑鬼才", description: "你聪明、机智、热衷于辩论。虽然嘴欠，但脑子好使。", traits: { straightScore: 80, straightComment: "杠精本精", eqScore: 30, eqComment: "赢了道理输了人" }, avatarEmoji: "🤓", avatarColor: "#d35400" },
+                { code: "INTP", name: "理论科学家", subtitle: "脑洞星人", description: "你生活在自己的逻辑世界里，对一切事物都充满好奇。你的直男表现堪称教科书级别的“不解风情”。", traits: { straightScore: 98, straightComment: "榆木疙瘩", eqScore: 10, eqComment: "注孤生潜力股" }, avatarEmoji: "🧪", avatarColor: "#8e44ad" },
+                { code: "ENFJ", name: "灵魂导师", subtitle: "精神领袖", description: "你富有魅力，善于鼓舞人心。你是很多女生的“男闺蜜”，因为太懂她们了。", traits: { straightScore: 30, straightComment: "知心大哥", eqScore: 95, eqComment: "共情能力MAX" }, avatarEmoji: "📖", avatarColor: "#16a085" },
+                { code: "INFJ", name: "神秘主义者", subtitle: "理想主义战士", description: "你有着深刻的洞察力和坚定的价值观。虽然看起来很直，但实际上心思细腻。", traits: { straightScore: 40, straightComment: "外冷内热", eqScore: 90, eqComment: "灵魂洞察者" }, avatarEmoji: "🔮", avatarColor: "#2980b9" },
+                { code: "ENFP", name: "快乐小狗", subtitle: "社交牛逼症", description: "你热情、奔放、充满好奇心。直男？你比女生还感性。", traits: { straightScore: 10, straightComment: "感性动物", eqScore: 98, eqComment: "人见人爱" }, avatarEmoji: "🐶", avatarColor: "#f39c12" },
+                { code: "INFP", name: "治愈系少年", subtitle: "永远的梦想家", description: "你温柔、善良、富有同情心。你的直男指数为零，因为你本身就是个需要被呵护的宝宝。", traits: { straightScore: 5, straightComment: "小仙男", eqScore: 99, eqComment: "人间天使" }, avatarEmoji: "🌸", avatarColor: "#9b59b6" }
+            ];
 
-        // 计算结果类型
-        function calculateResult() {
-            let scores = { E:0, I:0, S:0, N:0, T:0, F:0, J:0, P:0 };
-            answers.forEach(ans => {
-                const q = QUESTION_BANK.find(q => q.id === ans.questionId);
-                if (!q) return;
-                const option = q.options[ans.optionIndex];
-                if (option && option.trait) {
-                    scores[option.trait] += option.weight || 1;
-                }
+            const app = document.getElementById('app');
+            let currentView = 'home';        // 'home', 'quiz', 'result'
+            let answers = {};                // { questionId: optionIndex }
+            let finalType = null;
+
+            // 主题切换
+            const themeToggle = document.getElementById('themeToggle');
+            themeToggle.addEventListener('click', () => {
+                const body = document.body;
+                const currentTheme = body.getAttribute('data-bs-theme');
+                const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                body.setAttribute('data-bs-theme', newTheme);
+                themeToggle.innerHTML = newTheme === 'light' ? '<i class="bi bi-moon-stars-fill"></i>' : '<i class="bi bi-sun-fill"></i>';
+                // 重新渲染当前视图以适配主题样式 (简单处理: 重新调用当前渲染)
+                if (currentView === 'home') renderHome();
+                else if (currentView === 'quiz') renderQuiz();
+                else if (currentView === 'result') renderResult();
             });
-            const EI = scores.E >= scores.I ? 'E' : 'I';
-            const SN = scores.S >= scores.N ? 'S' : 'N';
-            const TF = scores.T >= scores.F ? 'T' : 'F';
-            const JP = scores.J >= scores.P ? 'J' : 'P';
-            const typeCode = EI + SN + TF + JP;
-            return RESULT_TYPES.find(t => t.code === typeCode) || RESULT_TYPES[0];
-        }
 
-        // 渲染首页
-        function renderHome() {
-            app.innerHTML = `
-                <div class="w-full bg-base-100/70 backdrop-blur-2xl rounded-3xl md:rounded-[2.5rem] p-8 sm:p-12 md:p-16 shadow-2xl border border-base-200 flex flex-col items-center text-center animate-fade-in">
-                    <div class="mb-6 text-6xl animate-bounce">🧔‍♂️</div>
-                    <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold text-base-content mb-6 tracking-tight leading-tight">
-                        MBTI 已经过时，<br>
-                        <span class="text-primary">BroTi</span> 来了。
-                    </h1>
-                    <p class="text-lg md:text-xl text-base-content/70 max-w-2xl mb-8">
-                        这不是那种做完只会得到标准答案的性格测试，而是一场更贴近直男日常迷惑行为、社交状态和生活方式的小小观察。
-                    </p>
-                    <button id="startBtn" class="btn btn-primary btn-lg px-10 rounded-full text-xl shadow-lg shadow-primary/30 hover:shadow-primary/40 transition-all">
-                        开始测试
-                    </button>
-                    <div class="mt-8 w-full max-w-2xl space-y-4 text-left border-t border-base-300 pt-6">
-                        <p class="text-base-content/60 italic">
-                            “你可能会一边选，一边忍不住感叹：‘这题怎么有点像在说我？’——放心，没有监控，只是有些小习惯真的太有辨识度。”
-                        </p>
-                    </div>
-                </div>
-            `;
-            document.getElementById('startBtn').addEventListener('click', () => {
-                currentView = 'quiz';
-                currentQuestionIndex = 0;
-                answers = [];
-                renderQuiz();
-            });
-        }
+            // 计算得分
+            function calculateResult() {
+                let scores = { E:0, I:0, S:0, N:0, T:0, F:0, J:0, P:0 };
+                Object.entries(answers).forEach(([qid, optIdx]) => {
+                    const q = QUESTION_BANK.find(q => q.id == qid);
+                    if (!q) return;
+                    const option = q.options[optIdx];
+                    if (option && option.trait) {
+                        scores[option.trait] += 1;
+                    }
+                });
+                const EI = scores.E >= scores.I ? 'E' : 'I';
+                const SN = scores.S >= scores.N ? 'S' : 'N';
+                const TF = scores.T >= scores.F ? 'T' : 'F';
+                const JP = scores.J >= scores.P ? 'J' : 'P';
+                const typeCode = EI + SN + TF + JP;
+                return RESULT_TYPES.find(t => t.code === typeCode) || RESULT_TYPES[0];
+            }
 
-        // 渲染答题页
-        function renderQuiz() {
-            const q = QUESTION_BANK[currentQuestionIndex];
-            const progress = ((currentQuestionIndex + 1) / QUESTION_BANK.length) * 100;
-            const existingAnswer = answers.find(a => a.questionId === q.id);
-            const selectedIndex = existingAnswer ? existingAnswer.optionIndex : -1;
-
-            let optionsHtml = '';
-            q.options.forEach((opt, idx) => {
-                const isSelected = (idx === selectedIndex);
-                optionsHtml += `
-                    <div class="card bg-base-200/50 hover:bg-base-200 border-2 ${isSelected ? 'border-primary' : 'border-transparent'} transition-all cursor-pointer p-5 rounded-2xl option-card" data-option-index="${idx}">
-                        <div class="flex items-start gap-4">
-                            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                                <span class="text-primary font-bold">${String.fromCharCode(65 + idx)}</span>
-                            </div>
-                            <div class="flex-1 text-left">
-                                <p class="text-lg font-medium text-base-content">${opt.text}</p>
-                                ${opt.desc ? `<p class="text-sm text-base-content/60 mt-1">${opt.desc}</p>` : ''}
+            // 首页
+            function renderHome() {
+                const isDark = document.body.getAttribute('data-bs-theme') === 'dark';
+                app.innerHTML = `
+                    <div class="row justify-content-center">
+                        <div class="col-12 col-md-10 col-lg-8">
+                            <div class="card card-test p-4 p-md-5 text-center">
+                                <div class="mb-4 display-1">🧔‍♂️</div>
+                                <h1 class="display-5 fw-bold mb-3" style="color: ${isDark ? '#e0e7ff' : '#1e293b'}">
+                                    你的直男人格是什么？
+                                </h1>
+                                <p class="lead mb-4" style="color: ${isDark ? '#b0c0e0' : '#475569'}">
+                                    20道精选题目，一次性回答，看看你的 BroTi 类型。
+                                </p>
+                                <button id="startBtn" class="btn btn-gradient btn-lg px-5 py-3 mt-3">
+                                    开始测试 <i class="bi bi-arrow-right ms-2"></i>
+                                </button>
+                                <p class="footer-note mt-5 small">
+                                    <i class="bi bi-chat-quote"></i> 别想太多，凭直觉选最像你的那个。
+                                </p>
                             </div>
                         </div>
                     </div>
                 `;
-            });
-
-            app.innerHTML = `
-                <div class="w-full bg-base-100/80 backdrop-blur-xl rounded-3xl p-6 md:p-10 shadow-2xl border border-base-200 animate-fade-in">
-                    <div class="mb-8">
-                        <div class="flex justify-between text-sm text-base-content/70 mb-2">
-                            <span>第 ${currentQuestionIndex + 1} / ${QUESTION_BANK.length} 题</span>
-                            <span>${Math.round(progress)}%</span>
-                        </div>
-                        <progress class="progress progress-primary w-full h-3" value="${progress}" max="100"></progress>
-                    </div>
-                    <h2 class="text-2xl md:text-3xl font-bold text-base-content mb-8 leading-relaxed">${q.text}</h2>
-                    <div class="space-y-4 mb-10">${optionsHtml}</div>
-                    <div class="flex justify-between">
-                        <button id="prevBtn" class="btn btn-outline btn-md px-8" ${currentQuestionIndex === 0 ? 'disabled' : ''}>← 上一题</button>
-                        <button id="nextBtn" class="btn btn-primary btn-md px-8">${currentQuestionIndex === QUESTION_BANK.length - 1 ? '查看结果' : '下一题 →'}</button>
-                    </div>
-                </div>
-            `;
-
-            document.querySelectorAll('.option-card').forEach(card => {
-                card.addEventListener('click', () => {
-                    const index = parseInt(card.dataset.optionIndex);
-                    const existingIdx = answers.findIndex(a => a.questionId === q.id);
-                    if (existingIdx >= 0) {
-                        answers[existingIdx].optionIndex = index;
-                    } else {
-                        answers.push({ questionId: q.id, optionIndex: index });
-                    }
+                document.getElementById('startBtn').addEventListener('click', () => {
+                    currentView = 'quiz';
+                    answers = {};
                     renderQuiz();
                 });
-            });
+            }
 
-            document.getElementById('prevBtn').addEventListener('click', () => {
-                if (currentQuestionIndex > 0) {
-                    currentQuestionIndex--;
-                    renderQuiz();
-                }
-            });
+            // 答题页 (所有题目平铺)
+            function renderQuiz() {
+                const isDark = document.body.getAttribute('data-bs-theme') === 'dark';
+                let questionsHtml = '';
+                QUESTION_BANK.forEach((q, idx) => {
+                    const selectedIdx = answers[q.id] !== undefined ? answers[q.id] : -1;
+                    let optionsHtml = '';
+                    q.options.forEach((opt, optIdx) => {
+                        const selectedClass = (selectedIdx === optIdx) ? 'selected' : '';
+                        optionsHtml += `
+                            <button class="option-btn btn ${selectedClass}" data-qid="${q.id}" data-optindex="${optIdx}">
+                                <span class="me-2 fw-bold">${String.fromCharCode(65 + optIdx)}.</span> ${opt.text}
+                            </button>
+                        `;
+                    });
+                    questionsHtml += `
+                        <div class="question-card">
+                            <h5 class="fw-semibold mb-3">${idx+1}. ${q.text}</h5>
+                            <div class="d-grid gap-2">
+                                ${optionsHtml}
+                            </div>
+                        </div>
+                    `;
+                });
 
-            document.getElementById('nextBtn').addEventListener('click', () => {
-                const hasAnswered = answers.some(a => a.questionId === q.id);
-                if (!hasAnswered) {
-                    alert('请先选择一个选项');
-                    return;
-                }
-                if (currentQuestionIndex === QUESTION_BANK.length - 1) {
+                const answeredCount = Object.keys(answers).length;
+                const total = QUESTION_BANK.length;
+                const progressPercent = (answeredCount / total) * 100;
+
+                app.innerHTML = `
+                    <div class="row justify-content-center">
+                        <div class="col-12 col-md-10 col-lg-8">
+                            <div class="card card-test p-4 p-md-5">
+                                <div class="d-flex align-items-center justify-content-between mb-3">
+                                    <h3 class="fw-bold mb-0" style="color: ${isDark ? '#e2e8f0' : '#1e293b'}">
+                                        <i class="bi bi-pencil-square me-2"></i>答题卡
+                                    </h3>
+                                    <span class="badge rounded-pill px-4 py-2" style="background: ${isDark ? '#312e81' : '#e0e7ff'}; color: ${isDark ? '#c7d2fe' : '#3730a3'}">
+                                        ${answeredCount}/${total} 题
+                                    </span>
+                                </div>
+                                <div class="progress progress-custom mb-4">
+                                    <div class="progress-bar bg-primary" role="progressbar" style="width: ${progressPercent}%;" aria-valuenow="${progressPercent}" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                                
+                                <div id="questionsContainer">
+                                    ${questionsHtml}
+                                </div>
+                                
+                                <div class="d-grid mt-4">
+                                    <button id="submitQuizBtn" class="btn btn-gradient btn-lg py-3">
+                                        查看结果 <i class="bi bi-bar-chart-fill ms-2"></i>
+                                    </button>
+                                </div>
+                                <button id="backHomeBtn" class="btn btn-link text-secondary mt-3">
+                                    <i class="bi bi-arrow-left"></i> 返回首页
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // 绑定选项点击事件
+                document.querySelectorAll('.option-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const qid = parseInt(btn.dataset.qid);
+                        const optIndex = parseInt(btn.dataset.optindex);
+                        answers[qid] = optIndex;
+                        // 重新渲染更新高亮
+                        renderQuiz();
+                    });
+                });
+
+                document.getElementById('submitQuizBtn').addEventListener('click', () => {
+                    if (Object.keys(answers).length < QUESTION_BANK.length) {
+                        alert(`你还有 ${QUESTION_BANK.length - Object.keys(answers).length} 道题未回答，请全部完成后再查看结果。`);
+                        return;
+                    }
                     finalType = calculateResult();
                     currentView = 'result';
                     renderResult();
-                } else {
-                    currentQuestionIndex++;
-                    renderQuiz();
-                }
-            });
-        }
+                });
 
-        // 渲染结果页
-        async function renderResult() {
-            const type = finalType;
-            
-            let resultHtml = `
-                <div id="resultCard" class="w-full bg-base-100/80 backdrop-blur-xl rounded-3xl p-6 md:p-10 shadow-2xl border border-base-200 animate-fade-in">
-                    <div class="flex flex-col items-center text-center">
-                        <div class="w-48 h-48 md:w-64 md:h-64 mb-6 rounded-full overflow-hidden border-4 border-primary shadow-xl avatar-placeholder" style="background: ${type.avatarColor}">
-                            <span class="text-7xl md:text-8xl">${type.avatarEmoji}</span>
-                        </div>
-                        
-                        <h2 class="text-4xl md:text-5xl font-extrabold text-primary mb-2">${type.name}</h2>
-                        <p class="text-xl text-base-content/70 mb-2">「${type.subtitle}」</p>
-                        <div class="badge badge-lg badge-outline mb-6">${type.code}</div>
-                        
-                        <div class="w-full max-w-2xl bg-base-200/50 rounded-2xl p-6 mb-8">
-                            <p class="text-lg leading-relaxed text-base-content">${type.description}</p>
-                        </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl mb-8">
-                            <div class="stat bg-base-200/50 rounded-box p-4">
-                                <div class="stat-title">直男指数</div>
-                                <div class="stat-value text-primary">${type.traits.straightScore}%</div>
-                                <div class="stat-desc">${type.traits.straightComment}</div>
+                document.getElementById('backHomeBtn').addEventListener('click', () => {
+                    currentView = 'home';
+                    renderHome();
+                });
+            }
+
+            // 结果页
+            async function renderResult() {
+                const type = finalType;
+                const isDark = document.body.getAttribute('data-bs-theme') === 'dark';
+                
+                app.innerHTML = `
+                    <div class="row justify-content-center">
+                        <div class="col-12 col-md-10 col-lg-8">
+                            <div id="resultCard" class="card card-test p-4 p-md-5 text-center">
+                                <div class="result-avatar" style="background: radial-gradient(circle at 30% 30%, ${type.avatarColor}dd, ${type.avatarColor}99);">
+                                    <span class="display-3">${type.avatarEmoji}</span>
+                                </div>
+                                <h2 class="fw-bold mb-2" style="color: ${isDark ? '#f1f5f9' : '#0f172a'}">${type.name}</h2>
+                                <p class="fs-5 text-secondary mb-3">「${type.subtitle}」</p>
+                                <span class="badge-type mb-4">${type.code}</span>
+                                
+                                <div class="bg-light bg-opacity-25 p-4 rounded-4 mb-4" style="background: ${isDark ? '#1e293b' : '#f8fafc'}">
+                                    <p class="lead mb-0">${type.description}</p>
+                                </div>
+                                
+                                <div class="row g-3 mb-4">
+                                    <div class="col-6">
+                                        <div class="p-3 rounded-4 h-100" style="background: ${isDark ? '#1e293b' : '#f1f5f9'}">
+                                            <div class="text-secondary small">直男指数</div>
+                                            <div class="display-6 fw-bold text-primary">${type.traits.straightScore}%</div>
+                                            <div class="small">${type.traits.straightComment}</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="p-3 rounded-4 h-100" style="background: ${isDark ? '#1e293b' : '#f1f5f9'}">
+                                            <div class="text-secondary small">情商潜力</div>
+                                            <div class="display-6 fw-bold text-success">${type.traits.eqScore}%</div>
+                                            <div class="small">${type.traits.eqComment}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex flex-wrap gap-3 justify-content-center">
+                                    <button id="shareBtn" class="btn btn-gradient px-4 py-2">
+                                        <i class="bi bi-download me-2"></i>保存结果卡片
+                                    </button>
+                                    <button id="retakeBtn" class="btn btn-outline-secondary rounded-pill px-4 py-2">
+                                        <i class="bi bi-arrow-repeat me-2"></i>重新测试
+                                    </button>
+                                </div>
+                                <p class="footer-note small mt-4">* 测试结果仅供娱乐，每个直男都是潜力股。</p>
                             </div>
-                            <div class="stat bg-base-200/50 rounded-box p-4">
-                                <div class="stat-title">情商潜力</div>
-                                <div class="stat-value text-secondary">${type.traits.eqScore}%</div>
-                                <div class="stat-desc">${type.traits.eqComment}</div>
-                            </div>
                         </div>
-                        
-                        <div class="flex flex-wrap gap-4 justify-center">
-                            <button id="shareBtn" class="btn btn-primary btn-wide">📤 生成图片分享</button>
-                            <button id="retakeBtn" class="btn btn-outline btn-wide">🔄 重新测试</button>
-                        </div>
-                        
-                        <p class="text-sm text-base-content/40 mt-8">* 测试结果仅供娱乐，不要太当真。毕竟，每个直男都是潜力股。</p>
                     </div>
-                </div>
-            `;
-            
-            app.innerHTML = resultHtml;
-            
-            document.getElementById('retakeBtn').addEventListener('click', () => {
-                currentView = 'home';
-                currentQuestionIndex = 0;
-                answers = [];
-                finalType = null;
-                renderHome();
-            });
-            
-            document.getElementById('shareBtn').addEventListener('click', async () => {
-                const btn = document.getElementById('shareBtn');
-                btn.innerHTML = '⏳ 生成中...';
-                btn.disabled = true;
-                try {
-                    const element = document.getElementById('resultCard');
-                    element.classList.add('bg-base-100');
-                    const canvas = await html2canvas(element, {
-                        scale: 2,
-                        backgroundColor: '#1e293b',
-                        allowTaint: true,
-                        useCQRS: true,
-                    });
-                    element.classList.remove('bg-base-100');
-                    const link = document.createElement('a');
-                    link.download = `BroTi-${type.code}.png`;
-                    link.href = canvas.toDataURL('image/png');
-                    link.click();
-                    btn.innerHTML = '✅ 已保存图片';
-                    setTimeout(() => {
-                        btn.innerHTML = '📤 生成图片分享';
-                        btn.disabled = false;
-                    }, 2000);
-                } catch (error) {
-                    console.error(error);
-                    alert('生成图片失败，可尝试截图保存。');
-                    btn.innerHTML = '📤 生成图片分享';
-                    btn.disabled = false;
-                }
-            });
-        }
+                `;
 
-        // 启动应用
-        renderHome();
+                document.getElementById('retakeBtn').addEventListener('click', () => {
+                    currentView = 'home';
+                    answers = {};
+                    finalType = null;
+                    renderHome();
+                });
+
+                document.getElementById('shareBtn').addEventListener('click', async () => {
+                    const btn = document.getElementById('shareBtn');
+                    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>生成中...';
+                    btn.disabled = true;
+                    try {
+                        const element = document.getElementById('resultCard');
+                        // 临时添加纯色背景防止透明
+                        element.style.background = isDark ? '#192132' : '#ffffff';
+                        const canvas = await html2canvas(element, {
+                            scale: 2.2,
+                            backgroundColor: isDark ? '#192132' : '#ffffff',
+                            allowTaint: true,
+                            useCQRS: true,
+                        });
+                        element.style.background = '';
+                        const link = document.createElement('a');
+                        link.download = `BroTi-${type.code}.png`;
+                        link.href = canvas.toDataURL('image/png');
+                        link.click();
+                        btn.innerHTML = '<i class="bi bi-check-lg me-2"></i>已保存';
+                        setTimeout(() => {
+                            btn.innerHTML = '<i class="bi bi-download me-2"></i>保存结果卡片';
+                            btn.disabled = false;
+                        }, 2000);
+                    } catch (error) {
+                        console.error(error);
+                        alert('生成图片失败，可尝试截图保存。');
+                        btn.innerHTML = '<i class="bi bi-download me-2"></i>保存结果卡片';
+                        btn.disabled = false;
+                    }
+                });
+            }
+
+            // 启动首页
+            renderHome();
+        })();
     </script>
 </body>
 </html>
