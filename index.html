@@ -1,684 +1,495 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="light">
+<html lang="zh-CN" data-theme="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SBTI人格测试 - MBTI已经过时了</title>
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Daisy UI -->
-  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
-  
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Noto Sans SC', 'system-ui', 'sans-serif'],
-          },
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>BroTi · 直男人格检测</title>
+    <meta name="description" content="测测你的直男人格成分，一份带点黑色幽默的自我观察报告。">
+    
+    <!-- Tailwind CSS + DaisyUI (通过 CDN) -->
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4/full.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- html2canvas 用于生成结果图片 -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    
+    <!-- 字体与基础样式 -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 40%, #0f172a 100%);
+            min-height: 100vh;
         }
-      },
-      daisyui: {
-        themes: [
-          {
-            light: {
-              ...require("daisyui/src/theming/themes")["light"],
-              "primary": "#6366f1",
-              "primary-focus": "#4f46e5",
-              "primary-content": "#ffffff",
-              "secondary": "#f59e0b",
-              "accent": "#10b981",
-              "neutral": "#f3f4f6",
-              "neutral-content": "#374151",
-              "base-100": "#ffffff",
-              "base-200": "#f9fafb",
-              "base-300": "#f3f4f6",
-              "info": "#3b82f6",
-              "success": "#10b981",
-              "warning": "#f59e0b",
-              "error": "#ef4444",
-              "--rounded-box": "1rem",
-              "--rounded-btn": "0.75rem",
-              "--rounded-badge": "999px",
-              "--animation-btn": "0.25s",
-              "--animation-input": "0.2s",
-              "--btn-text-case": "none",
-              "--navbar-padding": "0.5rem",
-              "--border-btn": "1px",
-              "--tab-border": "2px",
-              "--tab-radius": "0.5rem",
-            },
-          },
-        ],
-      },
-    }
-  </script>
-  
-  <style>
-    body {
-      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #fef3c7 100%);
-      background-attachment: fixed;
-    }
-    
-    .glass-card {
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(99, 102, 241, 0.1);
-    }
-    
-    .gradient-text {
-      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    
-    .option-item {
-      transition: all 0.2s ease;
-    }
-    
-    .option-item:hover {
-      transform: translateX(4px);
-      border-color: #6366f1;
-      background: rgba(99, 102, 241, 0.05);
-    }
-    
-    .option-item:has(input:checked) {
-      border-color: #6366f1;
-      background: rgba(99, 102, 241, 0.1);
-    }
-    
-    .screen {
-      display: none;
-      opacity: 0;
-      transform: translateY(20px);
-      transition: all 0.5s ease;
-    }
-    
-    .screen.active {
-      display: block;
-      opacity: 1;
-      transform: translateY(0);
-    }
-    
-    .loading-screen {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(255, 255, 255, 0.9);
-      backdrop-filter: blur(10px);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      z-index: 9999;
-    }
-    
-    .loading-screen.active {
-      display: flex;
-    }
-    
-    .poster-image {
-      width: 100%;
-      max-height: 400px;
-      object-fit: contain;
-      border-radius: 1rem;
-    }
-    
-    .dimension-item {
-      transition: all 0.2s ease;
-    }
-    
-    .dimension-item:hover {
-      transform: translateX(4px);
-    }
-  </style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out;
+        }
+        .option-card {
+            transition: all 0.2s ease;
+        }
+        .option-card:hover {
+            transform: translateX(4px);
+        }
+        /* 结果头像占位样式 */
+        .avatar-placeholder {
+            background: linear-gradient(145deg, #2a3a5c, #1a2a4c);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+    </style>
 </head>
-<body class="font-sans">
-  <!-- 加载状态 -->
-  <div class="loading-screen" id="loading">
-    <span class="loading loading-spinner loading-lg text-primary mb-4"></span>
-    <h5 class="text-primary font-medium">正在分析你的人格...</h5>
-  </div>
+<body class="min-h-screen flex flex-col items-center justify-center p-4 md:p-6 font-sans antialiased">
 
-  <div class="min-h-screen py-8 px-4">
-    <div class="max-w-3xl mx-auto">
-      <!-- 首页 -->
-      <section id="intro" class="screen active">
-        <div class="glass-card rounded-3xl shadow-xl p-8 md:p-12 text-center">
-          <div class="badge badge-primary badge-lg mb-6">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/>
-              <path d="M12 6a1 1 0 0 0-1 1v5a1 1 0 0 0 .293.707l3 3a1 1 0 0 0 1.414-1.414L13 11.586V7a1 1 0 0 0-1-1z"/>
-            </svg>
-            全新人格测评体系
-          </div>
-          
-          <h1 class="text-4xl md:text-5xl font-bold mb-4">
-            <span class="gradient-text">MBTI已经过时</span>
-            <br>
-            <span class="text-gray-800">SBTI来了</span>
-          </h1>
-          
-          <p class="text-gray-600 text-lg mb-8 max-w-md mx-auto">
-            基于十五维度深度分析，32道精选题目<br>
-            探索更真实、更立体的自我认知
-          </p>
-          
-          <button id="startBtn" class="btn btn-primary btn-lg px-10 text-white shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 transition-all">
-            开始测试
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M5 12h14M12 5l7 7-7 7"/>
-            </svg>
-          </button>
-          
-          <div class="mt-10 pt-6 border-t border-gray-200">
-            <p class="text-gray-400 text-sm">原作者： B站@蛆肉儿串儿</p>
-            </p>
-            <p class="text-gray-400 text-sm">UI：Daisy UI青春版 · 平台：Cloudflare Pages部署</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- 测试页面 -->
-      <section id="test" class="screen">
-        <div class="glass-card rounded-3xl shadow-xl p-6 md:p-8">
-          <div class="flex items-center gap-4 mb-6">
-            <div class="flex-1">
-              <progress id="progressBar" value="0" max="100" class="progress progress-primary h-3"></progress>
-            </div>
-            <span class="text-gray-500 font-medium min-w-[80px] text-right" id="progressText">0 / 32</span>
-          </div>
-
-          <div id="questionList"></div>
-
-          <div class="flex flex-wrap justify-between items-center mt-8 pt-6 border-t border-gray-200 gap-4">
-            <button id="backIntroBtn" class="btn btn-outline btn-primary">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M19 12H5M12 19l-7-7 7-7"/>
-              </svg>
-              返回首页
-            </button>
-            
-            <span class="text-gray-500 text-sm flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
-                <path d="M12 16v-4M12 8h.01"/>
-              </svg>
-              全选完才会放行。世界已经够乱了，起码把题做完整。
-            </span>
-            
-            <button id="submitBtn" class="btn btn-primary text-white" disabled>
-              提交并查看结果
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M5 12h14M12 5l7 7-7 7"/>
-              </svg>
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <!-- 结果页面 -->
-      <section id="result" class="screen">
-        <div class="glass-card rounded-3xl shadow-xl p-6 md:p-8">
-          <div class="grid md:grid-cols-2 gap-6 mb-6">
-            <div class="bg-gradient-to-br from-primary/5 to-secondary/5 rounded-2xl p-6 text-center border border-gray-100">
-              <img id="posterImage" class="poster-image mb-4 shadow-lg" src="" alt="人格海报">
-              <p class="text-gray-500" id="posterCaption"></p>
-            </div>
-            
-            <div class="flex flex-col justify-center">
-              <p class="text-primary text-sm font-bold uppercase tracking-wider mb-2" id="resultModeKicker">你的主类型</p>
-              <h2 class="text-3xl md:text-4xl font-bold gradient-text mb-2" id="resultTypeName"></h2>
-              <p class="text-gray-500 mb-6" id="resultTypeSub">基于十五维度深度分析</p>
-              <div class="badge badge-primary badge-lg" id="matchBadge"></div>
-            </div>
-          </div>
-
-          <div class="bg-gray-50 rounded-2xl p-6 mb-6 border border-gray-100">
-            <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
-                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
-              </svg>
-              该人格的简单解读
-            </h3>
-            <p class="text-gray-700 leading-relaxed" id="resultDesc"></p>
-          </div>
-
-          <div class="bg-white rounded-2xl p-6 mb-6 border border-gray-100">
-            <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M3 3v18h18"/>
-                <path d="M18 17V9M13 17V5M8 17v-3"/>
-              </svg>
-              十五维度评分
-            </h3>
-            <div id="dimList" class="space-y-3"></div>
-          </div>
-
-          <div class="bg-gradient-to-r from-info/10 to-success/10 rounded-2xl p-6 mb-6 border border-info/20">
-            <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-              </svg>
-              友情提示
-            </h3>
-            <p class="text-gray-600" id="funNote"></p>
-          </div>
-
-          <div class="collapse collapse-arrow bg-gray-50 rounded-2xl border border-gray-100 mb-6">
-            <input type="checkbox" />
-            <div class="collapse-content text-gray-600 space-y-3">
-             <script src="https://v1.hitokoto.cn/?encode=js&charset=utf-8"></script>
-            </div>
-          </div>
-
-          <div class="flex flex-wrap justify-end gap-3">
-            <button id="toTopBtn" class="btn btn-outline btn-primary">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-              </svg>
-              返回首页
-            </button>
-            <button id="restartBtn" class="btn btn-primary text-white">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0118.8-4.3M22 12.5a10 10 0 01-18.8 4.2"/>
-              </svg>
-              再测一次
-            </button>
-          </div>
-        </div>
-      </section>
+    <div id="app" class="w-full max-w-4xl mx-auto flex flex-col items-center">
+        <!-- 动态内容渲染区 -->
     </div>
-  </div>
-  
-  <script>
-    // ===== 数据定义（完全保留原内容）=====
-    
-    // 十五维度定义
-    const dimensionMeta = {
-      S1: { name: 'S1 自尊自信', model: '自我模型' },
-      S2: { name: 'S2 自我清晰度', model: '自我模型' },
-      S3: { name: 'S3 核心价值', model: '自我模型' },
-      E1: { name: 'E1 依恋安全感', model: '情感模型' },
-      E2: { name: 'E2 情感投入度', model: '情感模型' },
-      E3: { name: 'E3 边界与依赖', model: '情感模型' },
-      A1: { name: 'A1 世界观倾向', model: '态度模型' },
-      A2: { name: 'A2 规则与灵活度', model: '态度模型' },
-      A3: { name: 'A3 人生意义感', model: '态度模型' },
-      Ac1: { name: 'Ac1 动机导向', model: '行动驱力模型' },
-      Ac2: { name: 'Ac2 目标与计划性', model: '行动驱力模型' },
-      Ac3: { name: 'Ac3 执行力', model: '行动驱力模型' },
-      So1: { name: 'So1 社交能量', model: '社交模型' },
-      So2: { name: 'So2 社交策略', model: '社交模型' },
-      So3: { name: 'So3 亲密需求', model: '社交模型' }
-    };
 
-    const dimensionOrder = ['S1','S2','S3','E1','E2','E3','A1','A2','A3','Ac1','Ac2','Ac3','So1','So2','So3'];
+    <script>
+        // ---------- 题库数据 ----------
+        const QUESTION_BANK = [
+            {
+                id: 1,
+                text: "周末下午，你更倾向于怎么过？",
+                options: [
+                    { text: "约兄弟开黑或者打球，人越多越热闹", desc: "能量来自于外界", trait: "E", weight: 1 },
+                    { text: "宅家打游戏/看番/刷手机，享受独处", desc: "能量来自于独处", trait: "I", weight: 1 }
+                ]
+            },
+            {
+                id: 2,
+                text: "女朋友问你“我是不是胖了”，你的第一反应是？",
+                options: [
+                    { text: "上下打量一番，认真回答：“好像是胖了点，最近少吃点？”", desc: "基于事实", trait: "S", weight: 1 },
+                    { text: "立刻警觉：“没有没有，你怎么样都好看，我们去吃好吃的吧！”", desc: "基于直觉/情绪", trait: "N", weight: 1 }
+                ]
+            },
+            {
+                id: 3,
+                text: "兄弟找你借钱，但你知道他最近沉迷氪金手游，你会？",
+                options: [
+                    { text: "先问清楚用途，评估他能不能还，再决定借不借", desc: "理性分析", trait: "T", weight: 1 },
+                    { text: "觉得兄弟开口了不容易，能力范围内尽量帮一把", desc: "情感优先", trait: "F", weight: 1 }
+                ]
+            },
+            {
+                id: 4,
+                text: "出门旅游，你习惯？",
+                options: [
+                    { text: "提前做好详细攻略，酒店景点路线都定好", desc: "计划性强", trait: "J", weight: 1 },
+                    { text: "只订好机票酒店，剩下的到了再说，随缘逛", desc: "随性灵活", trait: "P", weight: 1 }
+                ]
+            },
+            {
+                id: 5,
+                text: "遇到一个很复杂的电器问题，你倾向于？",
+                options: [
+                    { text: "自己动手，拆开研究，看说明书/查视频", desc: "动手实干", trait: "S", weight: 1 },
+                    { text: "先想想原理，画个草图，再决定怎么下手", desc: "理论先行", trait: "N", weight: 1 }
+                ]
+            },
+            {
+                id: 6,
+                text: "朋友聚会时，你通常是？",
+                options: [
+                    { text: "气氛组，带动话题，聊个不停", desc: "外向", trait: "E", weight: 1 },
+                    { text: "安静听大家说，偶尔插几句", desc: "内向", trait: "I", weight: 1 }
+                ]
+            },
+            {
+                id: 7,
+                text: "工作中和同事有分歧，你更看重？",
+                options: [
+                    { text: "谁的想法更符合逻辑、更高效", desc: "对事不对人", trait: "T", weight: 1 },
+                    { text: "谁的态度更诚恳，不影响团队和谐", desc: "照顾情绪", trait: "F", weight: 1 }
+                ]
+            },
+            {
+                id: 8,
+                text: "你的桌面/电脑文件通常是？",
+                options: [
+                    { text: "井井有条，分门别类", desc: "秩序感", trait: "J", weight: 1 },
+                    { text: "看似混乱，但自己知道东西在哪", desc: "随意感", trait: "P", weight: 1 }
+                ]
+            }
+        ];
 
-    // 普通30题（映射到维度）
-    const rawQuestions = [
-      { dim: 'S1', text: '我对自己总体上持积极态度，即使失败也不会否定自我价值。' },
-      { dim: 'S2', text: '我很清楚真正的自己是什么样的。' },
-      { dim: 'S3', text: '我有清晰的人生目标和价值追求。' },
-      { dim: 'E1', text: '在感情中，我能感受到安全感，不会总担心被抛弃。' },
-      { dim: 'E2', text: '我对待每一段关系都是认真的，会真诚投入。' },
-      { dim: 'E3', text: '我在关系中既能亲密相处，也能保持独立空间。' },
-      { dim: 'A1', text: '我认为世界上好人多于坏人，对人性持乐观态度。' },
-      { dim: 'A2', text: '我喜欢打破常规，不喜欢被条条框框束缚。' },
-      { dim: 'A3', text: '我认为人生有明确的意义，不只是生存。' },
-      { dim: 'Ac1', text: '我做事主要为了取得成果和进步，而不是避免麻烦。' },
-      { dim: 'Ac2', text: '我做事通常有明确的计划和目标。' },
-      { dim: 'Ac3', text: '我的执行力强，能推动事情落地。' },
-      { dim: 'So1', text: '社交场合中，我能自如应对，不会感到特别疲惫。' },
-      { dim: 'So2', text: '我在不同人面前会展现出一致真实的自己。' },
-      { dim: 'So3', text: '我渴望与信任的人建立深度亲密关系。' },
-      { dim: 'S1', text: '外人的评价对我来说无关紧要。' },
-      { dim: 'S2', text: '在不同情境下，我的行为表现是一致的。' },
-      { dim: 'S3', text: '我内心有真正追求的东西。' },
-      { dim: 'E1', text: '我能平静接受关系中可能出现的变化和分离。' },
-      { dim: 'E2', text: '我在感情中经常担心被对方抛弃。' },
-      { dim: 'E3', text: '恋爱后，对象非常黏人，我作何感想？' },
-      { dim: 'A1', text: '大多数人本质是善良的。' },
-      { dim: 'A2', text: '规则和秩序对我来说很重要。' },
-      { dim: 'A3', text: '我觉得人生是有意义的旅程，不只是存在。' },
-      { dim: 'Ac1', text: '我一定要不断往上爬、变得更厉害。' },
-      { dim: 'Ac2', text: '我做事常常有计划。' },
-      { dim: 'Ac3', text: '别人说你"执行力强"，你内心更接近哪句？' },
-      { dim: 'So1', text: '朋友带了ta的朋友一起来玩，你最可能的状态是？' },
-      { dim: 'So2', text: '有时候你明明对一件事有不同的、负面的看法，但最后没说出来。多数情况下原因是？' },
-      { dim: 'So3', text: '我渴望和我信任的人关系密切，熟得像失散多年的亲戚。' }
-    ];
+        // ---------- 结果类型库 (包含 CSS 头像占位) ----------
+        const RESULT_TYPES = [
+            {
+                code: "ESTJ",
+                name: "钢铁司令官",
+                subtitle: "秩序守护者",
+                description: "你天生就是当领导的料，做事雷厉风行，原则性强。在你看来，世界就应该按照规则运转。兄弟找你帮忙，你会先问清楚前因后果；女朋友生气，你会试图用逻辑说服她（然后火上浇油）。你的直男癌指数不低，但靠谱程度极高。",
+                traits: { straightScore: 88, straightComment: "直来直去", eqScore: 35, eqComment: "需要多哄哄" },
+                avatarEmoji: "👨‍✈️",
+                avatarColor: "#3b5998"
+            },
+            {
+                code: "ISTJ",
+                name: "沉默质检员",
+                subtitle: "细节偏执狂",
+                description: "你是最可靠的执行者，沉默寡言但内心自有丘壑。你觉得花言巧语不如把事做好。女朋友问你新发型怎么样，你会认真端详后说：“左边比右边长了3毫米。”你的认真是一种别样的魅力，但有时候真的会气死人。",
+                traits: { straightScore: 92, straightComment: "直线思维", eqScore: 28, eqComment: "凭实力单身" },
+                avatarEmoji: "🔍",
+                avatarColor: "#4a5568"
+            },
+            {
+                code: "ESFJ",
+                name: "暖心老大哥",
+                subtitle: "妇女之友",
+                description: "你是团队里的粘合剂，热情、细心、照顾每个人的感受。你记得住兄弟的生日、女朋友的喜好，出门吃饭永远是你点菜。但有时候过于在意别人的看法，活得有点累。你的直男指数很低，堪称男性楷模。",
+                traits: { straightScore: 25, straightComment: "暖男本男", eqScore: 95, eqComment: "中央空调级别" },
+                avatarEmoji: "🤗",
+                avatarColor: "#e67e22"
+            },
+            {
+                code: "ISFJ",
+                name: "温柔守护者",
+                subtitle: "默默付出型",
+                description: "你就像一杯温水，不烫不凉，但最解渴。你不善言辞，但会把关心藏在行动里。下雨天你会默默去接她，兄弟喝多了你会负责送回家。你的直男表现就是：永远在做事，永远不会说情话。",
+                traits: { straightScore: 55, straightComment: "行动派", eqScore: 80, eqComment: "润物细无声" },
+                avatarEmoji: "🛡️",
+                avatarColor: "#27ae60"
+            },
+            {
+                code: "ESTP",
+                name: "社交悍匪",
+                subtitle: "全场最靓的仔",
+                description: "你胆大心细，享受刺激，是聚会上最会玩的人。撩妹技能点满，但也容易因为过于随性而显得不靠谱。兄弟有难你第一个上，女朋友生气你第一个跪。你的直男指数波动很大，取决于你当时的心情。",
+                traits: { straightScore: 60, straightComment: "直率", eqScore: 75, eqComment: "见人说人话" },
+                avatarEmoji: "😎",
+                avatarColor: "#f1c40f"
+            },
+            {
+                code: "ISTP",
+                name: "高冷手艺人",
+                subtitle: "人狠话不多",
+                description: "你是行走的工具箱，修电脑、换灯泡、组装家具无所不能。你觉得能用行动解决的事，绝不多BB。女朋友跟你抱怨工作累，你会直接问：“需要我给你重装系统吗？”——虽然搞错了方向，但手艺活真的没得说。",
+                traits: { straightScore: 90, straightComment: "工具人属性", eqScore: 20, eqComment: "别让我猜" },
+                avatarEmoji: "🔧",
+                avatarColor: "#7f8c8d"
+            },
+            {
+                code: "ESFP",
+                name: "人间小太阳",
+                subtitle: "快乐源泉",
+                description: "你是天生的表演家，有你的地方就有欢笑。你喜欢尝试新鲜事物，对世界充满好奇。虽然有时候做事三分钟热度，但你的乐观总能感染身边的人。直男？不存在的，你比女生还会玩。",
+                traits: { straightScore: 15, straightComment: "姐妹相称", eqScore: 98, eqComment: "气氛组担当" },
+                avatarEmoji: "🎉",
+                avatarColor: "#e84393"
+            },
+            {
+                code: "ISFP",
+                name: "文艺闷骚男",
+                subtitle: "内心有片海",
+                description: "你外表安静，内心却有着丰富的艺术细胞和感受力。你不喜欢冲突，追求和谐。在女生眼里，你有一种神秘的吸引力。但有时候过于被动和敏感，让人摸不透你在想什么。直男指数极低，但容易陷入自己的小世界。",
+                traits: { straightScore: 20, straightComment: "细腻敏感", eqScore: 85, eqComment: "懂得倾听" },
+                avatarEmoji: "🎨",
+                avatarColor: "#6c5ce7"
+            },
+            {
+                code: "ENTJ",
+                name: "霸道总裁",
+                subtitle: "天生的王者",
+                description: "你有极强的野心和控制欲，目标明确，行动力爆表。在你的字典里，没有“不可能”三个字。你喜欢掌控全局，也包括你的另一半。虽然你很大男子主义，但跟着你确实有肉吃。你的直男癌是那种“我不要你觉得，我要我觉得”的类型。",
+                traits: { straightScore: 85, straightComment: "霸道", eqScore: 40, eqComment: "爱你才管你" },
+                avatarEmoji: "👑",
+                avatarColor: "#c0392b"
+            },
+            {
+                code: "INTJ",
+                name: "幕后黑手",
+                subtitle: "独立思考者",
+                description: "你是完美的策略家，理性、冷静、有远见。你习惯独处，享受思考的乐趣。在别人眼里你可能有点高冷甚至孤僻，但你根本不在乎。你对另一半的要求是：聪明、独立、别来烦我。你的直男表现就是：用思维导图分析感情问题。",
+                traits: { straightScore: 95, straightComment: "理智到冷漠", eqScore: 15, eqComment: "感情是啥" },
+                avatarEmoji: "♟️",
+                avatarColor: "#2c3e50"
+            },
+            {
+                code: "ENTP",
+                name: "嘴强王者",
+                subtitle: "逻辑鬼才",
+                description: "你聪明、机智、热衷于辩论。你享受智力上的交锋，而不是情感上的共鸣。女朋友生气，你会兴致勃勃地跟她复盘整件事的逻辑漏洞，然后成功把她气哭。虽然你嘴很欠，但脑子是真的好使，总能想出奇妙的点子。",
+                traits: { straightScore: 80, straightComment: "杠精本精", eqScore: 30, eqComment: "赢了道理输了人" },
+                avatarEmoji: "🤓",
+                avatarColor: "#d35400"
+            },
+            {
+                code: "INTP",
+                name: "理论科学家",
+                subtitle: "脑洞星人",
+                description: "你生活在自己的逻辑世界里，对一切事物都充满好奇。你不修边幅，对外界事物反应迟钝。女朋友暗示你想喝奶茶，你会认真分析奶茶的成分和人体摄入糖分的利弊。你的直男表现堪称教科书级别的“不解风情”。",
+                traits: { straightScore: 98, straightComment: "榆木疙瘩", eqScore: 10, eqComment: "注孤生潜力股" },
+                avatarEmoji: "🧪",
+                avatarColor: "#8e44ad"
+            },
+            {
+                code: "ENFJ",
+                name: "灵魂导师",
+                subtitle: "精神领袖",
+                description: "你富有魅力，善于鼓舞人心，是天生的教育家。你总能敏锐地察觉到他人的情绪变化，并给予支持。你是很多女生的“男闺蜜”，因为太懂她们了。你的直男指数很低，但有时候因为太爱说教，会显得有点爹味。",
+                traits: { straightScore: 30, straightComment: "知心大哥", eqScore: 95, eqComment: "共情能力MAX" },
+                avatarEmoji: "📖",
+                avatarColor: "#16a085"
+            },
+            {
+                code: "INFJ",
+                name: "神秘主义者",
+                subtitle: "理想主义战士",
+                description: "你有着深刻的洞察力和坚定的价值观。你外表温和，内心却有一团火。你追求灵魂伴侣，对感情宁缺毋滥。虽然你看起来很直，但实际上心思细腻，只是懒得跟不熟的人废话。你有一套自己的处世哲学。",
+                traits: { straightScore: 40, straightComment: "外冷内热", eqScore: 90, eqComment: "灵魂洞察者" },
+                avatarEmoji: "🔮",
+                avatarColor: "#2980b9"
+            },
+            {
+                code: "ENFP",
+                name: "快乐小狗",
+                subtitle: "社交牛逼症",
+                description: "你热情、奔放、充满好奇心，是行走的正能量发射器。你对每个人都很好，以至于女朋友经常吃醋。你的脑洞很大，上一秒还在聊工作，下一秒就能跳到外星人。直男？你比女生还感性，看个广告都能哭。",
+                traits: { straightScore: 10, straightComment: "感性动物", eqScore: 98, eqComment: "人见人爱" },
+                avatarEmoji: "🐶",
+                avatarColor: "#f39c12"
+            },
+            {
+                code: "INFP",
+                name: "治愈系少年",
+                subtitle: "永远的梦想家",
+                description: "你温柔、善良、富有同情心，内心住着一个纯真的小孩。你对世界有着美好的憧憬，虽然有时候显得有点不切实际。你非常在意他人的感受，是很好的倾听者。你的直男指数为零，因为你本身就是个需要被呵护的宝宝。",
+                traits: { straightScore: 5, straightComment: "小仙男", eqScore: 99, eqComment: "人间天使" },
+                avatarEmoji: "🌸",
+                avatarColor: "#9b59b6"
+            }
+        ];
 
-    // 特殊两题（饮酒门槛）
-    const specialQuestions = [
-      { id: 'drink_q1', dim: 'special', text: '您平时有什么爱好？', options: ['A 吃喝拉撒', 'B 艺术爱好', 'C 饮酒', 'D 健身'] },
-      { id: 'drink_q2', dim: 'special', text: '说到饮酒，您一般？', options: ['A 小酌', 'B 买醉', 'C 来者不拒', 'D 只喝白的', 'E 有酒必喝'] }
-    ];
+        // ---------- 应用状态 ----------
+        const app = document.getElementById('app');
+        let currentView = 'home';
+        let currentQuestionIndex = 0;
+        let answers = [];
+        let finalType = null;
 
-    // 人格类型定义（带向量轮廓）
-    const types = {
-      CTRL: { code: 'CTRL', cn: '拿捏者', desc: '自信、目标导向、善于掌控局面。对自己有清晰认知，行动果断，能在复杂情境中抓住关键。', 
-        vec: { S1: 8, S2: 7, S3: 8, E1: 6, E2: 5, E3: 7, A1: 6, A2: 7, A3: 7, Ac1: 8, Ac2: 8, Ac3: 8, So1: 6, So2: 7, So3: 5 } },
-      FLEX: { code: 'FLEX', cn: '自适应者', desc: '灵活变通、随遇而安。能快速适应环境变化，在不同情境中找到舒适区。',
-        vec: { S1: 6, S2: 6, S3: 6, E1: 7, E2: 6, E3: 6, A1: 7, A2: 8, A3: 6, Ac1: 6, Ac2: 5, Ac3: 6, So1: 7, So2: 8, So3: 6 } },
-      DEPP: { code: 'DEPP', cn: '深度联结者', desc: '重视情感深度和亲密关系。渴望与人建立真诚深刻的连接，对感情投入且认真。',
-        vec: { S1: 6, S2: 7, S3: 7, E1: 5, E2: 8, E3: 5, A1: 7, A2: 5, A3: 7, Ac1: 6, Ac2: 6, Ac3: 6, So1: 5, So2: 6, So3: 8 } },
-      MASK: { code: 'MASK', cn: '面具佩戴者', desc: '社交场合中会根据情境调整表现。善于察言观色，在不同人面前展现不同侧面。',
-        vec: { S1: 5, S2: 5, S3: 6, E1: 6, E2: 5, E3: 6, A1: 6, A2: 6, A3: 6, Ac1: 6, Ac2: 6, Ac3: 6, So1: 7, So2: 8, So3: 5 } },
-      CYNI: { code: 'CYNI', cn: '愤世嫉俗者', desc: '对现状保持批判态度，看问题深入本质。不轻易相信表象，有自己的独立判断。',
-        vec: { S1: 6, S2: 7, S3: 6, E1: 6, E2: 4, E3: 7, A1: 3, A2: 7, A3: 5, Ac1: 5, Ac2: 6, Ac3: 5, So1: 5, So2: 5, So3: 4 } },
-      HOPE: { code: 'HOPE', cn: '希望持有者', desc: '对未来保持乐观，相信事情会向好的方向发展。即使在困境中也能看到光亮。',
-        vec: { S1: 7, S2: 6, S3: 8, E1: 7, E2: 7, E3: 6, A1: 9, A2: 6, A3: 8, Ac1: 7, Ac2: 7, Ac3: 7, So1: 7, So2: 6, So3: 7 } },
-      SHIT: { code: 'SHIT', cn: '躺平者', desc: '接受自己的不完美，对生活没有过高期待。活在当下，不为难自己，自在随性。',
-        vec: { S1: 5, S2: 5, S3: 4, E1: 6, E2: 4, E3: 6, A1: 5, A2: 7, A3: 4, Ac1: 3, Ac2: 3, Ac3: 4, So1: 6, So2: 6, So3: 5 } },
-      LONE: { code: 'LONE', cn: '独行者', desc: '享受独处，不依赖外界认可。有自己的世界，在孤独中感到自在和充实。',
-        vec: { S1: 7, S2: 8, S3: 7, E1: 7, E2: 3, E3: 8, A1: 6, A2: 7, A3: 7, Ac1: 6, Ac2: 7, Ac3: 7, So1: 3, So2: 5, So3: 3 } },
-      HIDE: { code: 'HIDE', cn: '隐藏者', desc: '不轻易展露真实想法，习惯把情绪和想法藏在心里。观察多于表达。',
-        vec: { S1: 5, S2: 6, S3: 6, E1: 5, E2: 4, E3: 6, A1: 5, A2: 5, A3: 6, Ac1: 5, Ac2: 6, Ac3: 5, So1: 4, So2: 4, So3: 4 } },
-      SEEK: { code: 'SEEK', cn: '追寻者', desc: '不断探索和追寻意义。对人生充满好奇，总在寻找答案和方向。',
-        vec: { S1: 6, S2: 6, S3: 7, E1: 5, E2: 6, E3: 5, A1: 6, A2: 7, A3: 7, Ac1: 7, Ac2: 6, Ac3: 6, So1: 6, So2: 6, So3: 6 } },
-      CARE: { code: 'CARE', cn: '关怀者', desc: '富有同理心，关心他人感受。愿意倾听和陪伴，给人温暖和支持。',
-        vec: { S1: 6, S2: 7, S3: 7, E1: 6, E2: 7, E3: 5, A1: 8, A2: 5, A3: 7, Ac1: 6, Ac2: 6, Ac3: 6, So1: 6, So2: 6, So3: 7 } },
-      PLAY: { code: 'PLAY', cn: '乐子人', desc: '享受当下的快乐，不为未来过度焦虑。能发现生活中的趣味，轻松自在。',
-        vec: { S1: 7, S2: 6, S3: 6, E1: 7, E2: 6, E3: 6, A1: 7, A2: 8, A3: 6, Ac1: 5, Ac2: 4, Ac3: 5, So1: 8, So2: 7, So3: 6 } },
-      PLAN: { code: 'PLAN', cn: '规划师', desc: '喜欢未雨绸缪，做事有条理。对目标有清晰规划，按部就班地推进。',
-        vec: { S1: 7, S2: 8, S3: 8, E1: 6, E2: 5, E3: 6, A1: 6, A2: 4, A3: 7, Ac1: 7, Ac2: 9, Ac3: 8, So1: 5, So2: 6, So3: 5 } },
-      REBL: { code: 'REBL', cn: '叛逆者', desc: '不服从常规，有自己的主见。敢于质疑权威，走自己的路。',
-        vec: { S1: 7, S2: 7, S3: 7, E1: 6, E2: 5, E3: 7, A1: 5, A2: 9, A3: 6, Ac1: 6, Ac2: 6, Ac3: 6, So1: 6, So2: 5, So3: 5 } },
-      SAFE: { code: 'SAFE', cn: '安全寻求者', desc: '重视稳定和安全感。偏好可预期的环境，不喜欢太多变化和风险。',
-        vec: { S1: 6, S2: 6, S3: 6, E1: 5, E2: 6, E3: 4, A1: 6, A2: 3, A3: 6, Ac1: 5, Ac2: 6, Ac3: 6, So1: 5, So2: 6, So3: 6 } },
-      PESS: { code: 'PESS', cn: '悲观者', desc: '倾向于看到事情的负面可能。虽然想法偏消极，但往往能预判风险。',
-        vec: { S1: 4, S2: 6, S3: 5, E1: 4, E2: 4, E3: 5, A1: 3, A2: 5, A3: 4, Ac1: 4, Ac2: 5, Ac3: 4, So1: 4, So2: 5, So3: 4 } },
-      FIGH: { code: 'FIGH', cn: '战斗者', desc: '面对困难不退缩，有斗争精神。遇到挑战会迎难而上，越挫越勇。',
-        vec: { S1: 7, S2: 7, S3: 7, E1: 6, E2: 6, E3: 6, A1: 6, A2: 7, A3: 7, Ac1: 8, Ac2: 7, Ac3: 8, So1: 6, So2: 6, So3: 6 } },
-      GIVE: { code: 'GIVE', cn: '给予者', desc: '乐于付出，不求回报。在帮助他人中获得满足，有奉献精神。',
-        vec: { S1: 6, S2: 6, S3: 7, E1: 6, E2: 7, E3: 4, A1: 8, A2: 5, A3: 7, Ac1: 6, Ac2: 6, Ac3: 6, So1: 6, So2: 6, So3: 7 } },
-      PERF: { code: 'PERF', cn: '完美主义者', desc: '追求卓越，对自己要求高。注重细节，希望把事情做到最好。',
-        vec: { S1: 6, S2: 8, S3: 8, E1: 5, E2: 6, E3: 6, A1: 5, A2: 5, A3: 7, Ac1: 8, Ac2: 8, Ac3: 8, So1: 5, So2: 6, So3: 5 } },
-      DGAF: { code: 'DGAF', cn: '无所谓者', desc: '对很多事情都不太在意，心态平和。不轻易被外界影响，保持内心平静。',
-        vec: { S1: 6, S2: 5, S3: 5, E1: 7, E2: 4, E3: 6, A1: 6, A2: 7, A3: 5, Ac1: 4, Ac2: 4, Ac3: 5, So1: 6, So2: 6, So3: 4 } },
-      LOST: { code: 'LOST', cn: '迷失者', desc: '正在寻找方向和答案。对未来有些迷茫，但也在努力探索。',
-        vec: { S1: 4, S2: 4, S3: 4, E1: 4, E2: 5, E3: 5, A1: 5, A2: 6, A3: 4, Ac1: 4, Ac2: 4, Ac3: 4, So1: 5, So2: 5, So3: 5 } },
-      FAKE: { code: 'FAKE', cn: '伪装者', desc: '习惯于隐藏真实自我，戴上面具社交。内心与外在表现可能有较大差异。',
-        vec: { S1: 4, S2: 4, S3: 5, E1: 4, E2: 4, E3: 5, A1: 4, A2: 6, A3: 5, Ac1: 4, Ac2: 5, Ac3: 4, So1: 6, So2: 8, So3: 4 } },
-      CLUE: { code: 'CLUE', cn: ' clueless', desc: '对很多事情不太确定，还在学习和摸索中。保持开放，接受各种可能。',
-        vec: { S1: 5, S2: 4, S3: 5, E1: 5, E2: 5, E3: 5, A1: 6, A2: 6, A3: 5, Ac1: 4, Ac2: 4, Ac3: 4, So1: 5, So2: 5, So3: 5 } },
-      OVER: { code: 'OVER', cn: '过度思考者', desc: '想太多，容易陷入思绪漩涡。分析能力很强，但有时过度思考导致行动力不足。',
-        vec: { S1: 5, S2: 7, S3: 6, E1: 4, E2: 5, E3: 5, A1: 5, A2: 6, A3: 6, Ac1: 5, Ac2: 6, Ac3: 4, So1: 4, So2: 5, So3: 5 } },
-      NEED: { code: 'NEED', cn: '需求者', desc: '需要他人的认可和支持。从外界获得能量，重视人际关系。',
-        vec: { S1: 5, S2: 5, S3: 6, E1: 4, E2: 7, E3: 3, A1: 6, A2: 5, A3: 6, Ac1: 5, Ac2: 5, Ac3: 5, So1: 6, So2: 6, So3: 7 } },
-      REAL: { code: 'REAL', cn: '真实者', desc: '做真实的自己，不伪装。言行一致，表里如一，活得坦诚。',
-        vec: { S1: 7, S2: 8, S3: 8, E1: 6, E2: 6, E3: 6, A1: 7, A2: 6, A3: 7, Ac1: 6, Ac2: 6, Ac3: 6, So1: 6, So2: 5, So3: 6 } }
-    };
-    
-    // 饮酒人格类型
-    const drinkTypes = {
-      SOBE: { code: 'SOBE', cn: '清醒者', desc: '保持清醒，不被欲望左右。有着超乎常人的自制力和定力。' },
-      DRNK: { code: 'DRNK', cn: '饮酒者', desc: '借酒消愁愁更愁。饮酒是你面对世界的方式。' },
-      SIMP: { code: 'SIMP', cn: '纯爱战士', desc: '为爱冲锋陷阵，不计后果。情感浓烈，容易陷得太深。' },
-      LOSR: { code: 'LOSR', cn: '屌丝', desc: '自嘲自黑的乐天派。表面摆烂，内心仍有期待。' },
-      IDOT: { code: 'IDOT', cn: '傻乐', desc: '简单快乐，想得少睡得好。活在当下，不为明天焦虑。' }
-    };
-
-    // 类型图片（占位符，可自行替换）
-    const TYPE_IMAGES = {
-      CTRL: 'https://picsum.photos/seed/ctrl/600/400',
-      FLEX: 'https://picsum.photos/seed/flex/600/400',
-      DEPP: 'https://picsum.photos/seed/depp/600/400',
-      MASK: 'https://picsum.photos/seed/mask/600/400',
-      CYNI: 'https://picsum.photos/seed/cyni/600/400',
-      HOPE: 'https://picsum.photos/seed/hope/600/400',
-      SHIT: 'https://picsum.photos/seed/shit/600/400',
-      LONE: 'https://picsum.photos/seed/lone/600/400',
-      HIDE: 'https://picsum.photos/seed/hide/600/400',
-      SEEK: 'https://picsum.photos/seed/seek/600/400',
-      CARE: 'https://picsum.photos/seed/care/600/400',
-      PLAY: 'https://picsum.photos/seed/play/600/400',
-      PLAN: 'https://picsum.photos/seed/plan/600/400',
-      REBL: 'https://picsum.photos/seed/rebl/600/400',
-      SAFE: 'https://picsum.photos/seed/safe/600/400',
-      PESS: 'https://picsum.photos/seed/pess/600/400',
-      FIGH: 'https://picsum.photos/seed/figh/600/400',
-      GIVE: 'https://picsum.photos/seed/give/600/400',
-      PERF: 'https://picsum.photos/seed/perf/600/400',
-      DGAF: 'https://picsum.photos/seed/dgaf/600/400',
-      LOST: 'https://picsum.photos/seed/lost/600/400',
-      FAKE: 'https://picsum.photos/seed/fake/600/400',
-      CLUE: 'https://picsum.photos/seed/clue/600/400',
-      OVER: 'https://picsum.photos/seed/over/600/400',
-      NEED: 'https://picsum.photos/seed/need/600/400',
-      REAL: 'https://picsum.photos/seed/real/600/400',
-      SOBE: 'https://picsum.photos/seed/sobe/600/400',
-      DRNK: 'https://picsum.photos/seed/drnk/600/400',
-      SIMP: 'https://picsum.photos/seed/simp/600/400',
-      LOSR: 'https://picsum.photos/seed/losr/600/400',
-      IDOT: 'https://picsum.photos/seed/idot/600/400'
-    };
-
-    const app = { answers: {}, shuffledQuestions: [], previewMode: false };
-    const loading = document.getElementById('loading');
-
-    // ===== 工具函数 =====
-    function shuffle(arr) {
-      const a = [...arr];
-      for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
-      }
-      return a;
-    }
-
-    function showScreen(id) {
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function getOptionText(qid, val) {
-      const map = {
-        q1: ['不认同', '中立', '认同'], q2: ['不认同', '中立', '认同'], q3: ['不认同', '中立', '认同'],
-        q4: ['不认同', '中立', '认同'], q5: ['不认同', '中立', '认同'], q6: ['不认同', '中立', '认同'],
-        q7: ['不认同', '中立', '认同'], q8: ['不认同', '中立', '认同'], q9: ['并没有', '也许？', '是的！'],
-        q10: ['就算ta再优秀我也不会陷入太深', '介于两者之间', '会非常珍惜ta'],
-        q11: ['那很爽了', '都行无所谓', '更喜欢保留独立空间'],
-        q12: ['更喜欢依赖与被依赖', '看情况', '是的！'],
-        q13: ['不认同', '中立', '认同'], q14: ['不认同', '中立', '认同'], q15: ['不认同', '中立', '认同'],
-        q16: ['认同', '保持中立', '不认同'], q17: ['不认同', '中立', '认同'], q18: ['认同', '中立', '不认同'],
-        q19: ['不认同', '中立', '认同'], q20: ['被逼到最后确实执行力超强', '有时候吧', '事情本该被推进'],
-        q21: ['不认同', '中立', '认同'], q22: ['选A', '选B', '选C'],
-        q23: ['邪恶的人心更多', '也许吧', '好人更多'], q24: ['隐瞒了我', '摇摆', '真的不舒服'],
-        q25: ['真见面有点忐忑', '能聊就聊', '打扮一番热情聊天'], q26: ['保持距离', '能玩就玩', '热情聊天'],
-        q27: ['认同', '中立', '不认同'], q28: ['不认同', '中立', '认同'],
-        q29: ['情况较少', '碍于情面', '不想让人知道'], q30: ['不认同', '中立', '认同']
-      };
-      return map[qid]?.[val - 1] || '';
-    }
-
-    // ===== 渲染函数 =====
-    function renderQuestions() {
-      const container = document.getElementById('questionList');
-      container.innerHTML = app.shuffledQuestions.map((q, idx) => {
-        const qnum = idx + 1;
-        const isSpecial = q.dim === 'special';
-        const badge = isSpecial ? '补充题' : `第 ${qnum} 题`;
-        const meta = isSpecial ? '维度已隐藏' : (dimensionMeta[q.dim]?.model || '维度已隐藏');
-        
-        let optionsHtml = '';
-        if (isSpecial) {
-          const opts = q.id === 'drink_q1' 
-            ? ['吃喝拉撒', '艺术爱好', '饮酒', '健身']
-            : ['小酌', '买醉', '来者不拒', '只喝白的', '有酒必喝'];
-          const codes = ['A', 'B', 'C', 'D', 'E'];
-          optionsHtml = opts.map((opt, i) => `
-            <label class="option-item flex items-center gap-4 p-4 border-2 border-gray-200 rounded-xl cursor-pointer">
-              <input type="radio" name="${q.id}" value="${i + 1}" class="radio radio-primary radio-lg">
-              <div class="w-10 h-10 rounded-lg bg-primary/10 text-primary font-bold flex items-center justify-center">${codes[i]}</div>
-              <div class="text-gray-700">${opt}</div>
-            </label>
-          `).join('');
-        } else {
-          const codes = ['A', 'B', 'C'];
-          const texts = [getOptionText(q.id, 1), getOptionText(q.id, 2), getOptionText(q.id, 3)];
-          optionsHtml = texts.map((text, i) => `
-            <label class="option-item flex items-center gap-4 p-4 border-2 border-gray-200 rounded-xl cursor-pointer">
-              <input type="radio" name="${q.id}" value="${i + 1}" class="radio radio-primary radio-lg">
-              <div class="w-10 h-10 rounded-lg bg-primary/10 text-primary font-bold flex items-center justify-center">${codes[i]}</div>
-              <div class="text-gray-700">${text}</div>
-            </label>
-          `).join('');
+        // 计算结果类型
+        function calculateResult() {
+            let scores = { E:0, I:0, S:0, N:0, T:0, F:0, J:0, P:0 };
+            answers.forEach(ans => {
+                const q = QUESTION_BANK.find(q => q.id === ans.questionId);
+                if (!q) return;
+                const option = q.options[ans.optionIndex];
+                if (option && option.trait) {
+                    scores[option.trait] += option.weight || 1;
+                }
+            });
+            const EI = scores.E >= scores.I ? 'E' : 'I';
+            const SN = scores.S >= scores.N ? 'S' : 'N';
+            const TF = scores.T >= scores.F ? 'T' : 'F';
+            const JP = scores.J >= scores.P ? 'J' : 'P';
+            const typeCode = EI + SN + TF + JP;
+            return RESULT_TYPES.find(t => t.code === typeCode) || RESULT_TYPES[0];
         }
 
-        return `
-          <div class="bg-white rounded-2xl p-6 mb-4 border border-gray-100 shadow-sm">
-            <div class="flex justify-between items-center mb-4">
-              <div class="badge badge-primary">${badge}</div>
-              <div class="text-gray-400 text-sm">${meta}</div>
-            </div>
-            <h5 class="text-lg font-medium text-gray-800 mb-5">${q.text}</h5>
-            <div class="space-y-3">${optionsHtml}</div>
-          </div>
-        `;
-      }).join('');
-
-      container.querySelectorAll('input[type="radio"]').forEach(radio => {
-        radio.addEventListener('change', updateProgress);
-      });
-      updateProgress();
-    }
-
-    function updateProgress() {
-      const total = app.shuffledQuestions.length;
-      let answered = 0;
-      app.shuffledQuestions.forEach(q => {
-        const name = q.dim === 'special' ? q.id : q.id;
-        const selected = document.querySelector(`input[name="${name}"]:checked`);
-        if (selected) {
-          app.answers[name] = parseInt(selected.value);
-          answered++;
+        // 渲染首页
+        function renderHome() {
+            app.innerHTML = `
+                <div class="w-full bg-base-100/70 backdrop-blur-2xl rounded-3xl md:rounded-[2.5rem] p-8 sm:p-12 md:p-16 shadow-2xl border border-base-200 flex flex-col items-center text-center animate-fade-in">
+                    <div class="mb-6 text-6xl animate-bounce">🧔‍♂️</div>
+                    <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold text-base-content mb-6 tracking-tight leading-tight">
+                        MBTI 已经过时，<br>
+                        <span class="text-primary">BroTi</span> 来了。
+                    </h1>
+                    <p class="text-lg md:text-xl text-base-content/70 max-w-2xl mb-8">
+                        这不是那种做完只会得到标准答案的性格测试，而是一场更贴近直男日常迷惑行为、社交状态和生活方式的小小观察。
+                    </p>
+                    <button id="startBtn" class="btn btn-primary btn-lg px-10 rounded-full text-xl shadow-lg shadow-primary/30 hover:shadow-primary/40 transition-all">
+                        开始测试
+                    </button>
+                    <div class="mt-8 w-full max-w-2xl space-y-4 text-left border-t border-base-300 pt-6">
+                        <p class="text-base-content/60 italic">
+                            “你可能会一边选，一边忍不住感叹：‘这题怎么有点像在说我？’——放心，没有监控，只是有些小习惯真的太有辨识度。”
+                        </p>
+                    </div>
+                </div>
+            `;
+            document.getElementById('startBtn').addEventListener('click', () => {
+                currentView = 'quiz';
+                currentQuestionIndex = 0;
+                answers = [];
+                renderQuiz();
+            });
         }
-      });
-      const pct = Math.round((answered / total) * 100);
-      document.getElementById('progressBar').value = pct;
-      document.getElementById('progressText').textContent = `${answered} / ${total}`;
-      
-      // 禁用/启用提交按钮
-      const submitBtn = document.getElementById('submitBtn');
-      submitBtn.disabled = answered < total;
-    }
 
-    function computeResult() {
-      const dimScores = {}; dimensionOrder.forEach(d => dimScores[d] = 0);
-      const dimCounts = {}; dimensionOrder.forEach(d => dimCounts[d] = 0);
+        // 渲染答题页
+        function renderQuiz() {
+            const q = QUESTION_BANK[currentQuestionIndex];
+            const progress = ((currentQuestionIndex + 1) / QUESTION_BANK.length) * 100;
+            const existingAnswer = answers.find(a => a.questionId === q.id);
+            const selectedIndex = existingAnswer ? existingAnswer.optionIndex : -1;
 
-      app.shuffledQuestions.forEach(q => {
-        if (q.dim === 'special') return;
-        const val = app.answers[q.id];
-        if (val) { dimScores[q.dim] += val; dimCounts[q.dim]++; }
-      });
+            let optionsHtml = '';
+            q.options.forEach((opt, idx) => {
+                const isSelected = (idx === selectedIndex);
+                optionsHtml += `
+                    <div class="card bg-base-200/50 hover:bg-base-200 border-2 ${isSelected ? 'border-primary' : 'border-transparent'} transition-all cursor-pointer p-5 rounded-2xl option-card" data-option-index="${idx}">
+                        <div class="flex items-start gap-4">
+                            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                                <span class="text-primary font-bold">${String.fromCharCode(65 + idx)}</span>
+                            </div>
+                            <div class="flex-1 text-left">
+                                <p class="text-lg font-medium text-base-content">${opt.text}</p>
+                                ${opt.desc ? `<p class="text-sm text-base-content/60 mt-1">${opt.desc}</p>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
 
-      const rawScores = {};
-      dimensionOrder.forEach(d => {
-        const avg = dimCounts[d] > 0 ? dimScores[d] / dimCounts[d] : 2;
-        rawScores[d] = Math.round(avg * 3.33);
-      });
+            app.innerHTML = `
+                <div class="w-full bg-base-100/80 backdrop-blur-xl rounded-3xl p-6 md:p-10 shadow-2xl border border-base-200 animate-fade-in">
+                    <div class="mb-8">
+                        <div class="flex justify-between text-sm text-base-content/70 mb-2">
+                            <span>第 ${currentQuestionIndex + 1} / ${QUESTION_BANK.length} 题</span>
+                            <span>${Math.round(progress)}%</span>
+                        </div>
+                        <progress class="progress progress-primary w-full h-3" value="${progress}" max="100"></progress>
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold text-base-content mb-8 leading-relaxed">${q.text}</h2>
+                    <div class="space-y-4 mb-10">${optionsHtml}</div>
+                    <div class="flex justify-between">
+                        <button id="prevBtn" class="btn btn-outline btn-md px-8" ${currentQuestionIndex === 0 ? 'disabled' : ''}>← 上一题</button>
+                        <button id="nextBtn" class="btn btn-primary btn-md px-8">${currentQuestionIndex === QUESTION_BANK.length - 1 ? '查看结果' : '下一题 →'}</button>
+                    </div>
+                </div>
+            `;
 
-      const typeScores = [];
-      for (const [key, type] of Object.entries(types)) {
-        let distance = 0;
-        dimensionOrder.forEach(d => {
-          const diff = (rawScores[d] || 5) - (type.vec[d] || 5);
-          distance += diff * diff;
-        });
-        const match = Math.max(0, Math.round(100 - Math.sqrt(distance) * 3));
-        typeScores.push({ key, type, match });
-      }
-      typeScores.sort((a, b) => b.match - a.match);
-      const bestNormal = typeScores[0];
+            document.querySelectorAll('.option-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const index = parseInt(card.dataset.optionIndex);
+                    const existingIdx = answers.findIndex(a => a.questionId === q.id);
+                    if (existingIdx >= 0) {
+                        answers[existingIdx].optionIndex = index;
+                    } else {
+                        answers.push({ questionId: q.id, optionIndex: index });
+                    }
+                    renderQuiz();
+                });
+            });
 
-      const drinkQ1 = app.answers['drink_q1'];
-      let finalType = bestNormal.type, modeKicker = '你的主类型', 
-          badge = `匹配度 ${bestNormal.match}%`, sub = '基于十五维度深度分析', special = false;
+            document.getElementById('prevBtn').addEventListener('click', () => {
+                if (currentQuestionIndex > 0) {
+                    currentQuestionIndex--;
+                    renderQuiz();
+                }
+            });
 
-      if (drinkQ1 === 3) {
-        special = true;
-        const drinkQ2 = app.answers['drink_q2'] || 1;
-        if (drinkQ2 === 1) finalType = drinkTypes.SOBE;
-        else if (drinkQ2 === 2) finalType = drinkTypes.DRNK;
-        else if (drinkQ2 === 3) finalType = drinkTypes.SIMP;
-        else if (drinkQ2 === 4) finalType = drinkTypes.LOSR;
-        else if (drinkQ2 === 5) finalType = drinkTypes.IDOT;
-        modeKicker = '饮酒专属类型';
-        badge = '怎么样，被我拿捏了吧？';
-        sub = '系统备注会显示在这里';
-      }
+            document.getElementById('nextBtn').addEventListener('click', () => {
+                const hasAnswered = answers.some(a => a.questionId === q.id);
+                if (!hasAnswered) {
+                    alert('请先选择一个选项');
+                    return;
+                }
+                if (currentQuestionIndex === QUESTION_BANK.length - 1) {
+                    finalType = calculateResult();
+                    currentView = 'result';
+                    renderResult();
+                } else {
+                    currentQuestionIndex++;
+                    renderQuiz();
+                }
+            });
+        }
 
-      // 渲染结果
-      document.getElementById('resultTypeName').textContent = `${finalType.code}（${finalType.cn}）`;
-      document.getElementById('resultModeKicker').textContent = modeKicker;
-      document.getElementById('resultTypeSub').textContent = sub;
-      document.getElementById('matchBadge').textContent = badge;
-      document.getElementById('resultDesc').textContent = finalType.desc;
-      document.getElementById('posterImage').src = TYPE_IMAGES[finalType.code] || '';
-      document.getElementById('posterCaption').textContent = `${finalType.cn}专属海报`;
+        // 渲染结果页
+        async function renderResult() {
+            const type = finalType;
+            
+            let resultHtml = `
+                <div id="resultCard" class="w-full bg-base-100/80 backdrop-blur-xl rounded-3xl p-6 md:p-10 shadow-2xl border border-base-200 animate-fade-in">
+                    <div class="flex flex-col items-center text-center">
+                        <div class="w-48 h-48 md:w-64 md:h-64 mb-6 rounded-full overflow-hidden border-4 border-primary shadow-xl avatar-placeholder" style="background: ${type.avatarColor}">
+                            <span class="text-7xl md:text-8xl">${type.avatarEmoji}</span>
+                        </div>
+                        
+                        <h2 class="text-4xl md:text-5xl font-extrabold text-primary mb-2">${type.name}</h2>
+                        <p class="text-xl text-base-content/70 mb-2">「${type.subtitle}」</p>
+                        <div class="badge badge-lg badge-outline mb-6">${type.code}</div>
+                        
+                        <div class="w-full max-w-2xl bg-base-200/50 rounded-2xl p-6 mb-8">
+                            <p class="text-lg leading-relaxed text-base-content">${type.description}</p>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl mb-8">
+                            <div class="stat bg-base-200/50 rounded-box p-4">
+                                <div class="stat-title">直男指数</div>
+                                <div class="stat-value text-primary">${type.traits.straightScore}%</div>
+                                <div class="stat-desc">${type.traits.straightComment}</div>
+                            </div>
+                            <div class="stat bg-base-200/50 rounded-box p-4">
+                                <div class="stat-title">情商潜力</div>
+                                <div class="stat-value text-secondary">${type.traits.eqScore}%</div>
+                                <div class="stat-desc">${type.traits.eqComment}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex flex-wrap gap-4 justify-center">
+                            <button id="shareBtn" class="btn btn-primary btn-wide">📤 生成图片分享</button>
+                            <button id="retakeBtn" class="btn btn-outline btn-wide">🔄 重新测试</button>
+                        </div>
+                        
+                        <p class="text-sm text-base-content/40 mt-8">* 测试结果仅供娱乐，不要太当真。毕竟，每个直男都是潜力股。</p>
+                    </div>
+                </div>
+            `;
+            
+            app.innerHTML = resultHtml;
+            
+            document.getElementById('retakeBtn').addEventListener('click', () => {
+                currentView = 'home';
+                currentQuestionIndex = 0;
+                answers = [];
+                finalType = null;
+                renderHome();
+            });
+            
+            document.getElementById('shareBtn').addEventListener('click', async () => {
+                const btn = document.getElementById('shareBtn');
+                btn.innerHTML = '⏳ 生成中...';
+                btn.disabled = true;
+                try {
+                    const element = document.getElementById('resultCard');
+                    element.classList.add('bg-base-100');
+                    const canvas = await html2canvas(element, {
+                        scale: 2,
+                        backgroundColor: '#1e293b',
+                        allowTaint: true,
+                        useCQRS: true,
+                    });
+                    element.classList.remove('bg-base-100');
+                    const link = document.createElement('a');
+                    link.download = `BroTi-${type.code}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                    btn.innerHTML = '✅ 已保存图片';
+                    setTimeout(() => {
+                        btn.innerHTML = '📤 生成图片分享';
+                        btn.disabled = false;
+                    }, 2000);
+                } catch (error) {
+                    console.error(error);
+                    alert('生成图片失败，可尝试截图保存。');
+                    btn.innerHTML = '📤 生成图片分享';
+                    btn.disabled = false;
+                }
+            });
+        }
 
-      // 渲染维度评分
-      const dimList = document.getElementById('dimList');
-      dimList.innerHTML = dimensionOrder.map(d => `
-        <div class="dimension-item bg-gray-50 rounded-xl p-4 border border-gray-100">
-          <div class="flex justify-between items-center mb-2">
-            <span class="font-medium text-gray-700">${dimensionMeta[d].name}</span>
-            <span class="badge badge-primary">${rawScores[d] || 0}分</span>
-          </div>
-          <progress class="progress progress-primary w-full h-2" value="${(rawScores[d] || 0) * 10}" max="100"></progress>
-          <p class="text-gray-400 text-sm mt-2 mb-0">${dimensionMeta[d].model}</p>
-        </div>
-      `).join('');
-
-      // 友情提示
-      document.getElementById('funNote').textContent = special 
-        ? '饮酒有害健康，建议适量饮酒或不饮酒。本测试仅供娱乐，请勿当真。'
-        : '测试结果仅供娱乐参考，不要过分迷信哦。每个人都是独一无二的个体。';
-    }
-
-    // ===== 事件监听 =====
-    document.getElementById('startBtn').addEventListener('click', () => {
-      // 准备题目
-      const questions = rawQuestions.map((q, i) => ({ ...q, id: `q${i + 1}` }));
-      app.shuffledQuestions = shuffle([...questions, ...specialQuestions]);
-      renderQuestions();
-      showScreen('test');
-    });
-
-    document.getElementById('backIntroBtn').addEventListener('click', () => {
-      showScreen('intro');
-    });
-
-    document.getElementById('submitBtn').addEventListener('click', () => {
-      loading.classList.add('active');
-      setTimeout(() => {
-        computeResult();
-        loading.classList.remove('active');
-        showScreen('result');
-      }, 1500);
-    });
-
-    document.getElementById('toTopBtn').addEventListener('click', () => {
-      showScreen('intro');
-    });
-
-    document.getElementById('restartBtn').addEventListener('click', () => {
-      app.answers = {};
-      const questions = rawQuestions.map((q, i) => ({ ...q, id: `q${i + 1}` }));
-      app.shuffledQuestions = shuffle([...questions, ...specialQuestions]);
-      renderQuestions();
-      showScreen('test');
-    });
-  </script>
+        // 启动应用
+        renderHome();
+    </script>
 </body>
 </html>
