@@ -1,215 +1,115 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SBTI人格测试 - MBTI已经过时了</title>
-  <!-- Bootstrap 5 CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Bootstrap Icons -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Daisy UI -->
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Noto Sans SC', 'system-ui', 'sans-serif'],
+          },
+        }
+      },
+      daisyui: {
+        themes: [
+          {
+            light: {
+              ...require("daisyui/src/theming/themes")["light"],
+              "primary": "#6366f1",
+              "primary-focus": "#4f46e5",
+              "primary-content": "#ffffff",
+              "secondary": "#f59e0b",
+              "accent": "#10b981",
+              "neutral": "#f3f4f6",
+              "neutral-content": "#374151",
+              "base-100": "#ffffff",
+              "base-200": "#f9fafb",
+              "base-300": "#f3f4f6",
+              "info": "#3b82f6",
+              "success": "#10b981",
+              "warning": "#f59e0b",
+              "error": "#ef4444",
+              "--rounded-box": "1rem",
+              "--rounded-btn": "0.75rem",
+              "--rounded-badge": "999px",
+              "--animation-btn": "0.25s",
+              "--animation-input": "0.2s",
+              "--btn-text-case": "none",
+              "--navbar-padding": "0.5rem",
+              "--border-btn": "1px",
+              "--tab-border": "2px",
+              "--tab-radius": "0.5rem",
+            },
+          },
+        ],
+      },
+    }
+  </script>
+  
   <style>
-    :root {
-      --primary: #6366f1;
-      --primary-dark: #4f46e5;
-      --primary-light: #818cf8;
-      --secondary: #64748b;
-      --dark: #0f172a;
-      --darker: #020617;
-      --card-bg: rgba(15, 23, 42, 0.85);
-      --border-color: rgba(99, 102, 241, 0.3);
-    }
-
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-      background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 50%, #1e1b4b 100%);
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #fef3c7 100%);
       background-attachment: fixed;
-      color: #f1f5f9;
-      min-height: 100vh;
-      position: relative;
     }
-
-    body::before {
-      content: "";
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-image: 
-        radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 80% 70%, rgba(129, 140, 248, 0.05) 0%, transparent 50%);
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .main-container {
-      position: relative;
-      z-index: 1;
-      padding: 2rem 0 4rem;
-    }
-
-    .card {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
+    
+    .glass-card {
+      background: rgba(255, 255, 255, 0.85);
       backdrop-filter: blur(20px);
-      border-radius: 1.5rem;
-      box-shadow: 0 20px 60px rgba(99, 102, 241, 0.15);
-      transition: all 0.3s ease;
+      border: 1px solid rgba(99, 102, 241, 0.1);
     }
-
-    .card:hover {
-      box-shadow: 0 25px 70px rgba(99, 102, 241, 0.25);
-      border-color: rgba(99, 102, 241, 0.5);
+    
+    .gradient-text {
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-      border: none;
-      border-radius: 0.75rem;
-      padding: 0.75rem 2rem;
-      font-weight: 600;
-      box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
-      transition: all 0.3s ease;
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 35px rgba(99, 102, 241, 0.4);
-    }
-
-    .btn-outline-primary {
-      border-color: var(--border-color);
-      color: var(--primary-light);
-      border-radius: 0.75rem;
-      padding: 0.75rem 2rem;
-      font-weight: 600;
-      background: rgba(255, 255, 255, 0.02);
-      transition: all 0.3s ease;
-    }
-
-    .btn-outline-primary:hover {
-      background: rgba(99, 102, 241, 0.1);
-      border-color: var(--primary);
-      color: white;
-    }
-
-    .badge {
-      background: rgba(99, 102, 241, 0.2);
-      color: var(--primary-light);
-      border: 1px solid var(--border-color);
-      font-weight: 600;
-      padding: 0.5rem 1rem;
-      border-radius: 999px;
-    }
-
-    .progress {
-      height: 0.75rem;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 999px;
-      overflow: hidden;
-      border: 1px solid rgba(99, 102, 241, 0.2);
-    }
-
-    .progress-bar {
-      background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
-      border-radius: 999px;
-      transition: width 0.4s ease;
-    }
-
-    .question-card {
-      border: 1px solid var(--border-color);
-      border-radius: 1.25rem;
-      padding: 1.5rem;
-      background: rgba(255, 255, 255, 0.03);
-      margin-bottom: 1.5rem;
-      transition: all 0.3s ease;
-    }
-
-    .question-card:hover {
-      border-color: rgba(99, 102, 241, 0.5);
-      background: rgba(255, 255, 255, 0.05);
-      transform: translateY(-2px);
-    }
-
+    
     .option-item {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      padding: 1rem 1.25rem;
-      border: 1px solid var(--border-color);
-      border-radius: 1rem;
-      margin-bottom: 0.75rem;
-      cursor: pointer;
       transition: all 0.2s ease;
-      background: rgba(255, 255, 255, 0.02);
     }
-
+    
     .option-item:hover {
-      border-color: var(--primary);
-      background: rgba(99, 102, 241, 0.1);
-    }
-
-    .option-item input[type="radio"] {
-      width: 1.25rem;
-      height: 1.25rem;
-      accent-color: var(--primary);
-      flex-shrink: 0;
-    }
-
-    .option-code {
-      width: 2rem;
-      height: 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 0.5rem;
-      background: rgba(99, 102, 241, 0.1);
-      color: var(--primary-light);
-      font-weight: 700;
-      font-size: 0.875rem;
-      transition: all 0.2s ease;
-    }
-
-    .option-item input:checked ~ .option-code {
-      background: var(--primary);
-      color: white;
-    }
-
-    .dimension-item {
-      border: 1px solid var(--border-color);
-      border-radius: 1rem;
-      padding: 1rem 1.25rem;
-      margin-bottom: 1rem;
-      background: rgba(255, 255, 255, 0.03);
-      transition: all 0.2s ease;
-    }
-
-    .dimension-item:hover {
-      border-color: var(--primary);
       transform: translateX(4px);
+      border-color: #6366f1;
+      background: rgba(99, 102, 241, 0.05);
     }
-
+    
+    .option-item:has(input:checked) {
+      border-color: #6366f1;
+      background: rgba(99, 102, 241, 0.1);
+    }
+    
     .screen {
       display: none;
       opacity: 0;
       transform: translateY(20px);
       transition: all 0.5s ease;
     }
-
+    
     .screen.active {
       display: block;
       opacity: 1;
       transform: translateY(0);
     }
-
+    
     .loading-screen {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(2, 6, 23, 0.9);
+      background: rgba(255, 255, 255, 0.9);
       backdrop-filter: blur(10px);
       display: none;
       align-items: center;
@@ -217,206 +117,195 @@
       flex-direction: column;
       z-index: 9999;
     }
-
+    
     .loading-screen.active {
       display: flex;
     }
-
-    .spinner {
-      width: 4rem;
-      height: 4rem;
-      border: 4px solid rgba(99, 102, 241, 0.2);
-      border-top-color: var(--primary);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    .gradient-text {
-      background: linear-gradient(135deg, #ffffff 0%, var(--primary-light) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .accordion-item {
-      background: transparent;
-      border: 1px solid var(--border-color);
-      border-radius: 1rem !important;
-      overflow: hidden;
-    }
-
-    .accordion-button {
-      background: rgba(255, 255, 255, 0.03);
-      color: #f1f5f9;
-      font-weight: 600;
-      border: none;
-    }
-
-    .accordion-button:not(.collapsed) {
-      background: rgba(99, 102, 241, 0.1);
-      color: white;
-      box-shadow: none;
-    }
-
-    .accordion-button::after {
-      filter: invert(1);
-    }
-
+    
     .poster-image {
       width: 100%;
       max-height: 400px;
       object-fit: contain;
       border-radius: 1rem;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     }
-
-    @media (max-width: 768px) {
-      .main-container {
-        padding: 1rem 0 3rem;
-      }
-      
-      .card {
-        border-radius: 1rem;
-      }
-      
-      .question-card {
-        padding: 1.25rem;
-      }
+    
+    .dimension-item {
+      transition: all 0.2s ease;
+    }
+    
+    .dimension-item:hover {
+      transform: translateX(4px);
     }
   </style>
 </head>
-<body>
+<body class="font-sans">
   <!-- 加载状态 -->
   <div class="loading-screen" id="loading">
-    <div class="spinner mb-4"></div>
-    <h5 class="text-primary">正在分析你的人格...</h5>
+    <span class="loading loading-spinner loading-lg text-primary mb-4"></span>
+    <h5 class="text-primary font-medium">正在分析你的人格...</h5>
   </div>
 
-  <div class="container main-container">
-    <div class="row justify-content-center">
-      <div class="col-lg-8 col-md-10">
-        <!-- 首页 -->
-        <section id="intro" class="screen active">
-          <div class="card p-5 text-center">
-            <span class="badge mb-4">
-              <i class="bi bi-dna me-2"></i>全新人格测评体系
-            </span>
-            <h1 class="display-4 fw-bold mb-3 gradient-text">
-              MBTI已经过时<br>SBTI来了
-            </h1>
-            <p class="text-muted mb-5 fs-5">
-              基于十五维度深度分析，32道精选题目<br>
-              探索更真实、更立体的自我认知
+  <div class="min-h-screen py-8 px-4">
+    <div class="max-w-3xl mx-auto">
+      <!-- 首页 -->
+      <section id="intro" class="screen active">
+        <div class="glass-card rounded-3xl shadow-xl p-8 md:p-12 text-center">
+          <div class="badge badge-primary badge-lg mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/>
+              <path d="M12 6a1 1 0 0 0-1 1v5a1 1 0 0 0 .293.707l3 3a1 1 0 0 0 1.414-1.414L13 11.586V7a1 1 0 0 0-1-1z"/>
+            </svg>
+            全新人格测评体系
+          </div>
+          
+          <h1 class="text-4xl md:text-5xl font-bold mb-4">
+            <span class="gradient-text">MBTI已经过时</span>
+            <br>
+            <span class="text-gray-800">SBTI来了</span>
+          </h1>
+          
+          <p class="text-gray-600 text-lg mb-8 max-w-md mx-auto">
+            基于十五维度深度分析，32道精选题目<br>
+            探索更真实、更立体的自我认知
+          </p>
+          
+          <button id="startBtn" class="btn btn-primary btn-lg px-10 text-white shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 transition-all">
+            开始测试
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </button>
+          
+          <div class="mt-10 pt-6 border-t border-gray-200">
+            <p class="text-gray-500 mb-2">
+              原作者：
+              <a href="https://space.bilibili.com/417038183" target="_blank" class="text-primary hover:underline font-medium">
+                B站@蛆肉儿串儿
+              </a>
             </p>
-            <button id="startBtn" class="btn btn-primary btn-lg px-5">
-              开始测试
+            <p class="text-gray-400 text-sm">Daisy UI青春版 · 适配Cloudflare Pages部署</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 测试页面 -->
+      <section id="test" class="screen">
+        <div class="glass-card rounded-3xl shadow-xl p-6 md:p-8">
+          <div class="flex items-center gap-4 mb-6">
+            <div class="flex-1">
+              <progress id="progressBar" value="0" max="100" class="progress progress-primary h-3"></progress>
+            </div>
+            <span class="text-gray-500 font-medium min-w-[80px] text-right" id="progressText">0 / 32</span>
+          </div>
+
+          <div id="questionList"></div>
+
+          <div class="flex flex-wrap justify-between items-center mt-8 pt-6 border-t border-gray-200 gap-4">
+            <button id="backIntroBtn" class="btn btn-outline btn-primary">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+              </svg>
+              返回首页
             </button>
-            <div class="mt-5 pt-4 border-top border-secondary">
-              <p class="text-muted mb-2">原作者：<a href="https://space.bilibili.com/417038183" target="_blank" class="text-primary text-decoration-none">B站@蛆肉儿串儿</a></p>
-              <p class="text-muted small">Bootstrap UI重制版 · 适配Cloudflare Pages部署</p>
+            
+            <span class="text-gray-500 text-sm flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+                <path d="M12 16v-4M12 8h.01"/>
+              </svg>
+              全选完才会放行。世界已经够乱了，起码把题做完整。
+            </span>
+            
+            <button id="submitBtn" class="btn btn-primary text-white" disabled>
+              提交并查看结果
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 结果页面 -->
+      <section id="result" class="screen">
+        <div class="glass-card rounded-3xl shadow-xl p-6 md:p-8">
+          <div class="grid md:grid-cols-2 gap-6 mb-6">
+            <div class="bg-gradient-to-br from-primary/5 to-secondary/5 rounded-2xl p-6 text-center border border-gray-100">
+              <img id="posterImage" class="poster-image mb-4 shadow-lg" src="" alt="人格海报">
+              <p class="text-gray-500" id="posterCaption"></p>
+            </div>
+            
+            <div class="flex flex-col justify-center">
+              <p class="text-primary text-sm font-bold uppercase tracking-wider mb-2" id="resultModeKicker">你的主类型</p>
+              <h2 class="text-3xl md:text-4xl font-bold gradient-text mb-2" id="resultTypeName"></h2>
+              <p class="text-gray-500 mb-6" id="resultTypeSub">基于十五维度深度分析</p>
+              <div class="badge badge-primary badge-lg" id="matchBadge"></div>
             </div>
           </div>
-        </section>
 
-        <!-- 测试页面 -->
-        <section id="test" class="screen">
-          <div class="card p-4">
-            <div class="d-flex align-items-center gap-3 mb-4">
-              <div class="progress flex-grow-1">
-                <div class="progress-bar" id="progressBar" style="width: 0%"></div>
-              </div>
-              <span class="text-muted fw-semibold" id="progressText">0 / 32</span>
+          <div class="bg-gray-50 rounded-2xl p-6 mb-6 border border-gray-100">
+            <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+              </svg>
+              该人格的简单解读
+            </h3>
+            <p class="text-gray-700 leading-relaxed" id="resultDesc"></p>
+          </div>
+
+          <div class="bg-white rounded-2xl p-6 mb-6 border border-gray-100">
+            <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 3v18h18"/>
+                <path d="M18 17V9M13 17V5M8 17v-3"/>
+              </svg>
+              十五维度评分
+            </h3>
+            <div id="dimList" class="space-y-3"></div>
+          </div>
+
+          <div class="bg-gradient-to-r from-info/10 to-success/10 rounded-2xl p-6 mb-6 border border-info/20">
+            <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+              </svg>
+              友情提示
+            </h3>
+            <p class="text-gray-600" id="funNote"></p>
+          </div>
+
+          <div class="collapse collapse-arrow bg-gray-50 rounded-2xl border border-gray-100 mb-6">
+            <input type="checkbox" /> 
+            <div class="collapse-title text-xl font-bold text-gray-800">
+              作者的话
             </div>
-
-            <div id="questionList"></div>
-
-            <div class="d-flex flex-wrap justify-content-between align-items-center mt-4 pt-4 border-top border-secondary">
-              <button id="backIntroBtn" class="btn btn-outline-primary mb-2 mb-md-0">
-                <i class="bi bi-arrow-left me-2"></i>返回首页
-              </button>
-              <span class="text-muted small mb-2 mb-md-0">
-                <i class="bi bi-info-circle me-1"></i>全选完才会放行。世界已经够乱了，起码把题做完整。
-              </span>
-              <button id="submitBtn" class="btn btn-primary" disabled>
-                提交并查看结果 <i class="bi bi-arrow-right ms-2"></i>
-              </button>
+            <div class="collapse-content text-gray-600 space-y-3">
+              <p>本测试首发于b站up主蛆肉儿串儿（UID417038183），初衷是劝诫一位爱喝酒的朋友戒酒。</p>
+              <p>由于作者的人格是SHIT愤世者，所以平等的攻击了各位，在此抱歉！！不过我是一个绝世大美女，你们一定会原谅我，有B站的朋友们也可以关注我。</p>
+              <p>关于这个测试，我没法很好的平衡娱乐和专业性，因此对于一些人格的阐释较为模糊或完全不准（如屌丝可能并非真的屌丝），如有冒犯非常抱歉！！</p>
+              <p>再鉴于时间精力有限，就随便搞了一个先这样玩玩，后续会慢慢完善修改的，总之好玩为主，还请不要用于盈利呀。</p>
             </div>
           </div>
-        </section>
 
-        <!-- 结果页面 -->
-        <section id="result" class="screen">
-          <div class="card p-4">
-            <div class="row g-4 mb-4">
-              <div class="col-md-6">
-                <div class="card h-100 p-4 text-center">
-                  <img id="posterImage" class="poster-image mb-3" src="" alt="人格海报">
-                  <p class="text-muted" id="posterCaption"></p>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="card h-100 p-4">
-                  <p class="text-primary text-uppercase small fw-bold mb-2" id="resultModeKicker">你的主类型</p>
-                  <h2 class="display-5 fw-bold gradient-text mb-2" id="resultTypeName"></h2>
-                  <p class="text-muted mb-4" id="resultTypeSub">基于十五维度深度分析</p>
-                  <span class="badge fs-6" id="matchBadge"></span>
-                </div>
-              </div>
-            </div>
-
-            <div class="card p-4 mb-4">
-              <h3 class="h4 fw-bold mb-3">该人格的简单解读</h3>
-              <p class="text-light" id="resultDesc"></p>
-            </div>
-
-            <div class="card p-4 mb-4">
-              <h3 class="h4 fw-bold mb-3">十五维度评分</h3>
-              <div id="dimList"></div>
-            </div>
-
-            <div class="card p-4 mb-4">
-              <h3 class="h4 fw-bold mb-3">友情提示</h3>
-              <p class="text-muted" id="funNote"></p>
-            </div>
-
-            <div class="accordion mb-4" id="authorAccordion">
-              <div class="accordion-item">
-                <h2 class="accordion-header">
-                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#authorContent">
-                    作者的话
-                  </button>
-                </h2>
-                <div id="authorContent" class="accordion-collapse collapse" data-bs-parent="#authorAccordion">
-                  <div class="accordion-body text-muted">
-                    <p>本测试首发于b站up主蛆肉儿串儿（UID417038183），初衷是劝诫一位爱喝酒的朋友戒酒。</p>
-                    <p>由于作者的人格是SHIT愤世者，所以平等的攻击了各位，在此抱歉！！不过我是一个绝世大美女，你们一定会原谅我，有B站的朋友们也可以关注我。</p>
-                    <p>关于这个测试，我没法很好的平衡娱乐和专业性，因此对于一些人格的阐释较为模糊或完全不准（如屌丝可能并非真的屌丝），如有冒犯非常抱歉！！</p>
-                    <p>再鉴于时间精力有限，就随便搞了一个先这样玩玩，后续会慢慢完善修改的，总之好玩为主，还请不要用于盈利呀。</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="d-flex flex-wrap justify-content-end gap-3">
-              <button id="toTopBtn" class="btn btn-outline-primary">
-                <i class="bi bi-house me-2"></i>返回首页
-              </button>
-              <button id="restartBtn" class="btn btn-primary">
-                <i class="bi bi-arrow-repeat me-2"></i>再测一次
-              </button>
-            </div>
+          <div class="flex flex-wrap justify-end gap-3">
+            <button id="toTopBtn" class="btn btn-outline btn-primary">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+              </svg>
+              返回首页
+            </button>
+            <button id="restartBtn" class="btn btn-primary text-white">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0118.8-4.3M22 12.5a10 10 0 01-18.8 4.2"/>
+              </svg>
+              再测一次
+            </button>
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
     </div>
   </div>
-
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   
   <script>
     // ===== 数据定义（完全保留原内容）=====
@@ -637,32 +526,32 @@
             : ['小酌', '买醉', '来者不拒', '只喝白的', '有酒必喝'];
           const codes = ['A', 'B', 'C', 'D', 'E'];
           optionsHtml = opts.map((opt, i) => `
-            <label class="option-item">
-              <input type="radio" name="${q.id}" value="${i + 1}">
-              <div class="option-code">${codes[i]}</div>
-              <div>${opt}</div>
+            <label class="option-item flex items-center gap-4 p-4 border-2 border-gray-200 rounded-xl cursor-pointer">
+              <input type="radio" name="${q.id}" value="${i + 1}" class="radio radio-primary radio-lg">
+              <div class="w-10 h-10 rounded-lg bg-primary/10 text-primary font-bold flex items-center justify-center">${codes[i]}</div>
+              <div class="text-gray-700">${opt}</div>
             </label>
           `).join('');
         } else {
           const codes = ['A', 'B', 'C'];
           const texts = [getOptionText(q.id, 1), getOptionText(q.id, 2), getOptionText(q.id, 3)];
           optionsHtml = texts.map((text, i) => `
-            <label class="option-item">
-              <input type="radio" name="${q.id}" value="${i + 1}">
-              <div class="option-code">${codes[i]}</div>
-              <div>${text}</div>
+            <label class="option-item flex items-center gap-4 p-4 border-2 border-gray-200 rounded-xl cursor-pointer">
+              <input type="radio" name="${q.id}" value="${i + 1}" class="radio radio-primary radio-lg">
+              <div class="w-10 h-10 rounded-lg bg-primary/10 text-primary font-bold flex items-center justify-center">${codes[i]}</div>
+              <div class="text-gray-700">${text}</div>
             </label>
           `).join('');
         }
 
         return `
-          <div class="question-card">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-              <span class="badge">${badge}</span>
-              <span class="text-muted small">${meta}</span>
+          <div class="bg-white rounded-2xl p-6 mb-4 border border-gray-100 shadow-sm">
+            <div class="flex justify-between items-center mb-4">
+              <div class="badge badge-primary">${badge}</div>
+              <div class="text-gray-400 text-sm">${meta}</div>
             </div>
-            <h5 class="mb-4">${q.text}</h5>
-            <div>${optionsHtml}</div>
+            <h5 class="text-lg font-medium text-gray-800 mb-5">${q.text}</h5>
+            <div class="space-y-3">${optionsHtml}</div>
           </div>
         `;
       }).join('');
@@ -685,7 +574,7 @@
         }
       });
       const pct = Math.round((answered / total) * 100);
-      document.getElementById('progressBar').style.width = pct + '%';
+      document.getElementById('progressBar').value = pct;
       document.getElementById('progressText').textContent = `${answered} / ${total}`;
       
       // 禁用/启用提交按钮
@@ -751,15 +640,13 @@
       // 渲染维度评分
       const dimList = document.getElementById('dimList');
       dimList.innerHTML = dimensionOrder.map(d => `
-        <div class="dimension-item">
-          <div class="d-flex justify-content-between align-items-center mb-2">
-            <span class="fw-semibold">${dimensionMeta[d].name}</span>
-            <span class="badge">${rawScores[d] || 0}分</span>
+        <div class="dimension-item bg-gray-50 rounded-xl p-4 border border-gray-100">
+          <div class="flex justify-between items-center mb-2">
+            <span class="font-medium text-gray-700">${dimensionMeta[d].name}</span>
+            <span class="badge badge-primary">${rawScores[d] || 0}分</span>
           </div>
-          <div class="progress" style="height: 0.5rem;">
-            <div class="progress-bar" style="width: ${(rawScores[d] || 0) * 10}%"></div>
-          </div>
-          <p class="text-muted small mt-2 mb-0">${dimensionMeta[d].model}</p>
+          <progress class="progress progress-primary w-full h-2" value="${(rawScores[d] || 0) * 10}" max="100"></progress>
+          <p class="text-gray-400 text-sm mt-2 mb-0">${dimensionMeta[d].model}</p>
         </div>
       `).join('');
 
