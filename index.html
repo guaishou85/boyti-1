@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SBTI 人格测试</title>
+  <style>
+    :root {
+      --bg: #0f0f1a;
+      --panel: rgba(30, 30, 50, 0.8);
+      --text: #e8e8f0;
+      --muted: #9090a8;
+      --line: rgba(120, 100, 200, 0.3);
+      --soft: rgba(80, 60, 160, 0.2);
+      --accent: #a78bfa;
+      --accent-strong: #8b5cf6;
+      --shadow: 0 20px 60px rgba(139, 92, 246, 0.15);
+      --radius: 20px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at 30% 20%, rgba(139, 92, 246, 0.08) 0%, transparent 40%),
+                  radial-gradient(circle at 70% 80%, rgba(167, 139, 250, 0.06) 0%, transparent 40%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .shell {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 24px 16px 56px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(20px);
+    }
+
+    /* Landing Page */
+    .hero {
+      padding: 60px 32px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.2) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--accent);
+      border: 1px solid var(--line);
+      background: var(--soft);
+      border-radius: 999px;
+      padding: 8px 16px;
+      margin-bottom: 24px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    h1 {
+      font-size: clamp(32px, 6vw, 56px);
+      line-height: 1.1;
+      font-weight: 800;
+      background: linear-gradient(135deg, #fff 0%, #a78bfa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 16px;
+    }
+
+    .hero .sub {
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.8;
+      max-width: 500px;
+      margin: 0 auto 32px;
+    }
+
+    .hero-actions {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      font: inherit;
+      transition: all 0.3s ease;
+      font-weight: 600;
+    }
+
+    button:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4); }
+    button:disabled { cursor: not-allowed; opacity: 0.5; transform: none; }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+      color: #fff;
+      padding: 16px 36px;
+      border-radius: 12px;
+      font-size: 16px;
+      box-shadow: 0 8px 30px rgba(139, 92, 246, 0.3);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      padding: 16px 36px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+    }
+
+    .btn-secondary:hover { background: var(--soft); }
+
+    .credits {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 2;
+    }
+
+    .credits a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .credits a:hover { text-decoration: underline; }
+
+    /* Screen Management */
+    .screen { display: none; opacity: 0; transition: opacity 0.4s ease; }
+    .screen.active { display: block; opacity: 1; }
+
+    /* Test Page */
+    .test-wrap { padding: 28px; margin-top: 20px; }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .progress {
+      flex: 1;
+      min-width: 200px;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress > span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, #8b5cf6, #a78bfa);
+      border-radius: inherit;
+      transition: width 0.3s ease;
+    }
+
+    .progress-text {
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .question-list { display: grid; gap: 20px; }
+
+    .question {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 24px;
+      background: rgba(255, 255, 255, 0.03);
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .question:hover { border-color: rgba(139, 92, 246, 0.5); }
+
+    .question-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 6px 12px;
+      background: var(--soft);
+      border: 1px solid var(--line);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .question-title {
+      font-size: 17px;
+      line-height: 1.7;
+      color: var(--text);
+      white-space: pre-wrap;
+    }
+
+    .options {
+      display: grid;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .option {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 18px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.03);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .option:hover {
+      border-color: rgba(139, 92, 246, 0.5);
+      background: rgba(139, 92, 246, 0.1);
+    }
+
+    .option input {
+      accent-color: var(--accent-strong);
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    .option-code {
+      font-weight: 700;
+      color: var(--accent);
+      min-width: 24px;
+      font-size: 14px;
+    }
+
+    .option > div:last-child { flex: 1; }
+
+    .actions-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    /* Result Page */
+    .result-wrap { padding: 28px; margin-top: 20px; }
+
+    .result-top {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .result-top { grid-template-columns: 1fr; }
+      .hero { padding: 40px 24px; }
+      h1 { font-size: 36px; }
+    }
+
+    .poster-box, .type-box, .analysis-box, .dim-box, .note-box {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 24px;
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .poster-box {
+      display: grid;
+      grid-template-rows: 1fr auto;
+      min-height: 280px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .poster-box::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at 50% 30%, rgba(139, 92, 246, 0.15) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .poster-image {
+      width: 100%;
+      max-height: 400px;
+      object-fit: contain;
+      border-radius: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .poster-box.no-image .poster-image { display: none; }
+
+    .poster-caption {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.8;
+      position: relative;
+      z-index: 1;
+    }
+
+    .type-kicker {
+      font-size: 12px;
+      color: var(--accent);
+      margin-bottom: 8px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .type-name {
+      font-size: clamp(28px, 5vw, 42px);
+      line-height: 1.1;
+      font-weight: 800;
+      background: linear-gradient(135deg, #fff 0%, #a78bfa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .type-subname {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .match {
+      margin-top: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      padding: 10px 18px;
+      background: var(--soft);
+      border: 1px solid var(--line);
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .analysis-box h3, .dim-box h3, .note-box h3 {
+      font-size: 18px;
+      margin-bottom: 16px;
+      color: var(--text);
+    }
+
+    .analysis-box p {
+      color: var(--text);
+      font-size: 15px;
+      line-height: 1.9;
+      white-space: pre-wrap;
+    }
+
+    .dim-list { display: grid; gap: 12px; }
+
+    .dim-item {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .dim-item-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .dim-item-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .dim-item-score {
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .dim-item p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .note-box p {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .result-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    /* Author Box */
+    .author-box {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.03);
+      overflow: hidden;
+      margin-top: 24px;
+    }
+
+    .author-box summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 20px 24px;
+      font-size: 16px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .author-box summary::-webkit-details-marker { display: none; }
+    .author-box summary::after {
+      content: '展开';
+      font-size: 12px;
+      color: var(--accent);
+      border: 1px solid var(--line);
+      background: var(--soft);
+      padding: 6px 14px;
+      border-radius: 999px;
+    }
+    .author-box[open] summary::after { content: '收起'; }
+
+    .author-content {
+      border-top: 1px solid var(--line);
+      padding: 0 24px 24px;
+    }
+
+    .author-content p {
+      margin: 16px 0 0;
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.9;
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <!-- Landing Screen -->
+    <section id="intro" class="screen active">
+      <div class="hero card">
+        <div class="eyebrow">🧬 全新人格测评体系</div>
+        <h1>MBTI已经过时<br>SBTI来了</h1>
+        <p class="sub">基于十五维度深度分析，32道精选题目<br>探索更真实、更立体的自我认知</p>
+        <div class="hero-actions">
+          <button id="startBtn" class="btn-primary">开始测试</button>
+        </div>
+        <div class="credits">
+          <div>原作者：<a href="https://space.bilibili.com/417038183" target="_blank">B站@蛆肉儿串儿</a></div>
+          <div>UI重设计版 · 适配Cloudflare Pages部署</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Test Screen -->
+    <section id="test" class="screen">
+      <div class="test-wrap card">
+        <div class="topbar">
+          <div class="progress"><span id="progressBar"></span></div>
+          <div class="progress-text" id="progressText">0 / 31</div>
+        </div>
+        <div id="questionList" class="question-list"></div>
+        <div class="actions-bottom">
+          <button id="backIntroBtn" class="btn-secondary">返回首页</button>
+          <span class="hint">全选完才会放行。世界已经够乱了，起码把题做完整。</span>
+          <button id="submitBtn" class="btn-primary">提交并查看结果</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Result Screen -->
+    <section id="result" class="screen">
+      <div class="result-wrap card">
+        <div class="result-top">
+          <div class="poster-box" id="posterBox">
+            <img id="posterImage" class="poster-image" src="" alt="">
+            <p class="poster-caption" id="posterCaption"></p>
+          </div>
+          <div class="type-box">
+            <div class="type-kicker" id="resultModeKicker">你的主类型</div>
+            <div class="type-name" id="resultTypeName"></div>
+            <div class="type-subname" id="resultTypeSub"></div>
+            <div class="match" id="matchBadge"></div>
+          </div>
+        </div>
+        <div class="analysis-box" style="margin-bottom: 24px;">
+          <h3>该人格的简单解读</h3>
+          <p id="resultDesc"></p>
+        </div>
+        <div class="dim-box">
+          <h3>十五维度评分</h3>
+          <div class="dim-list" id="dimList"></div>
+        </div>
+        <div class="note-box" style="margin-top: 24px;">
+          <h3>友情提示</h3>
+          <p id="funNote"></p>
+        </div>
+        <details class="author-box">
+          <summary>作者的话</summary>
+          <div class="author-content">
+            <p>本测试首发于b站up主蛆肉儿串儿（UID417038183），初衷是劝诫一位爱喝酒的朋友戒酒。</p>
+            <p>由于作者的人格是SHIT愤世者，所以平等的攻击了各位，在此抱歉！！不过我是一个绝世大美女，你们一定会原谅我，有B站的朋友们也可以关注我。</p>
+            <p>关于这个测试，我没法很好的平衡娱乐和专业性，因此对于一些人格的阐释较为模糊或完全不准（如屌丝可能并非真的屌丝），如有冒犯非常抱歉！！</p>
+            <p>再鉴于时间精力有限，就随便搞了一个先这样玩玩，后续会慢慢完善修改的，总之好玩为主，还请不要用于盈利呀。</p>
+          </div>
+        </details>
+        <div class="result-actions">
+          <button id="toTopBtn" class="btn-secondary">返回首页</button>
+          <button id="restartBtn" class="btn-primary">再测一次</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // ===== 数据定义 =====
+    
+    // 十五维度定义
+    const dimensionMeta = {
+      S1: { name: 'S1 自尊自信', model: '自我模型' },
+      S2: { name: 'S2 自我清晰度', model: '自我模型' },
+      S3: { name: 'S3 核心价值', model: '自我模型' },
+      E1: { name: 'E1 依恋安全感', model: '情感模型' },
+      E2: { name: 'E2 情感投入度', model: '情感模型' },
+      E3: { name: 'E3 边界与依赖', model: '情感模型' },
+      A1: { name: 'A1 世界观倾向', model: '态度模型' },
+      A2: { name: 'A2 规则与灵活度', model: '态度模型' },
+      A3: { name: 'A3 人生意义感', model: '态度模型' },
+      Ac1: { name: 'Ac1 动机导向', model: '行动驱力模型' },
+      Ac2: { name: 'Ac2 目标与计划性', model: '行动驱力模型' },
+      Ac3: { name: 'Ac3 执行力', model: '行动驱力模型' },
+      So1: { name: 'So1 社交能量', model: '社交模型' },
+      So2: { name: 'So2 社交策略', model: '社交模型' },
+      So3: { name: 'So3 亲密需求', model: '社交模型' }
+    };
+
+    const dimensionOrder = ['S1','S2','S3','E1','E2','E3','A1','A2','A3','Ac1','Ac2','Ac3','So1','So2','So3'];
+
+    // 普通30题（映射到维度）
+    const rawQuestions = [
+      { dim: 'S1', text: '我对自己总体上持积极态度，即使失败也不会否定自我价值。' },
+      { dim: 'S2', text: '我很清楚真正的自己是什么样的。' },
+      { dim: 'S3', text: '我有清晰的人生目标和价值追求。' },
+      { dim: 'E1', text: '在感情中，我能感受到安全感，不会总担心被抛弃。' },
+      { dim: 'E2', text: '我对待每一段关系都是认真的，会真诚投入。' },
+      { dim: 'E3', text: '我在关系中既能亲密相处，也能保持独立空间。' },
+      { dim: 'A1', text: '我认为世界上好人多于坏人，对人性持乐观态度。' },
+      { dim: 'A2', text: '我喜欢打破常规，不喜欢被条条框框束缚。' },
+      { dim: 'A3', text: '我认为人生有明确的意义，不只是生存。' },
+      { dim: 'Ac1', text: '我做事主要为了取得成果和进步，而不是避免麻烦。' },
+      { dim: 'Ac2', text: '我做事通常有明确的计划和目标。' },
+      { dim: 'Ac3', text: '我的执行力强，能推动事情落地。' },
+      { dim: 'So1', text: '社交场合中，我能自如应对，不会感到特别疲惫。' },
+      { dim: 'So2', text: '我在不同人面前会展现出一致真实的自己。' },
+      { dim: 'So3', text: '我渴望与信任的人建立深度亲密关系。' },
+      { dim: 'S1', text: '外人的评价对我来说无关紧要。' },
+      { dim: 'S2', text: '在不同情境下，我的行为表现是一致的。' },
+      { dim: 'S3', text: '我内心有真正追求的东西。' },
+      { dim: 'E1', text: '我能平静接受关系中可能出现的变化和分离。' },
+      { dim: 'E2', text: '我在感情中经常担心被对方抛弃。' },
+      { dim: 'E3', text: '恋爱后，对象非常黏人，我作何感想？' },
+      { dim: 'A1', text: '大多数人本质是善良的。' },
+      { dim: 'A2', text: '规则和秩序对我来说很重要。' },
+      { dim: 'A3', text: '我觉得人生是有意义的旅程，不只是存在。' },
+      { dim: 'Ac1', text: '我一定要不断往上爬、变得更厉害。' },
+      { dim: 'Ac2', text: '我做事常常有计划。' },
+      { dim: 'Ac3', text: '别人说你"执行力强"，你内心更接近哪句？' },
+      { dim: 'So1', text: '朋友带了ta的朋友一起来玩，你最可能的状态是？' },
+      { dim: 'So2', text: '有时候你明明对一件事有不同的、负面的看法，但最后没说出来。多数情况下原因是？' },
+      { dim: 'So3', text: '我渴望和我信任的人关系密切，熟得像失散多年的亲戚。' }
+    ];
+
+    // 特殊两题（饮酒门槛）
+    const specialQuestions = [
+      { id: 'drink_q1', dim: 'special', text: '您平时有什么爱好？', options: ['A 吃喝拉撒', 'B 艺术爱好', 'C 饮酒', 'D 健身'] },
+      { id: 'drink_q2', dim: 'special', text: '说到饮酒，您一般？', options: ['A 小酌', 'B 买醉', 'C 来者不拒', 'D 只喝白的', 'E 有酒必喝'] }
+    ];
+
+    // 人格类型定义（带向量轮廓）
+    const types = {
+      CTRL: { code: 'CTRL', cn: '拿捏者', desc: '自信、目标导向、善于掌控局面。对自己有清晰认知，行动果断，能在复杂情境中抓住关键。', 
+        vec: { S1: 8, S2: 7, S3: 8, E1: 6, E2: 5, E3: 7, A1: 6, A2: 7, A3: 7, Ac1: 8, Ac2: 8, Ac3: 8, So1: 6, So2: 7, So3: 5 } },
+      FLEX: { code: 'FLEX', cn: '自适应者', desc: '灵活变通、随遇而安。能快速适应环境变化，在不同情境中找到舒适区。',
+        vec: { S1: 6, S2: 6, S3: 6, E1: 7, E2: 6, E3: 6, A1: 7, A2: 8, A3: 6, Ac1: 6, Ac2: 5, Ac3: 6, So1: 7, So2: 8, So3: 6 } },
+      DEPP: { code: 'DEPP', cn: '深度联结者', desc: '重视情感深度和亲密关系。渴望与人建立真诚深刻的连接，对感情投入且认真。',
+        vec: { S1: 6, S2: 7, S3: 7, E1: 5, E2: 8, E3: 5, A1: 7, A2: 5, A3: 7, Ac1: 6, Ac2: 6, Ac3: 6, So1: 5, So2: 6, So3: 8 } },
+      MASK: { code: 'MASK', cn: '面具佩戴者', desc: '社交场合中会根据情境调整表现。善于察言观色，在不同人面前展现不同侧面。',
+        vec: { S1: 5, S2: 5, S3: 6, E1: 6, E2: 5, E3: 6, A1: 6, A2: 6, A3: 6, Ac1: 6, Ac2: 6, Ac3: 6, So1: 7, So2: 8, So3: 5 } },
+      CYNI: { code: 'CYNI', cn: '愤世嫉俗者', desc: '对现状保持批判态度，看问题深入本质。不轻易相信表象，有自己的独立判断。',
+        vec: { S1: 6, S2: 7, S3: 6, E1: 6, E2: 4, E3: 7, A1: 3, A2: 7, A3: 5, Ac1: 5, Ac2: 6, Ac3: 5, So1: 5, So2: 5, So3: 4 } },
+      HOPE: { code: 'HOPE', cn: '希望持有者', desc: '对未来保持乐观，相信事情会向好的方向发展。即使在困境中也能看到光亮。',
+        vec: { S1: 7, S2: 6, S3: 8, E1: 7, E2: 7, E3: 6, A1: 9, A2: 6, A3: 8, Ac1: 7, Ac2: 7, Ac3: 7, So1: 7, So2: 6, So3: 7 } },
+      SHIT: { code: 'SHIT', cn: '躺平者', desc: '接受自己的不完美，对生活没有过高期待。活在当下，不为难自己，自在随性。',
+        vec: { S1: 5, S2: 5, S3: 4, E1: 6, E2: 4, E3: 6, A1: 5, A2: 7, A3: 4, Ac1: 3, Ac2: 3, Ac3: 4, So1: 6, So2: 6, So3: 5 } },
+      LONE: { code: 'LONE', cn: '独行者', desc: '享受独处，不依赖外界认可。有自己的世界，在孤独中感到自在和充实。',
+        vec: { S1: 7, S2: 8, S3: 7, E1: 7, E2: 3, E3: 8, A1: 6, A2: 7, A3: 7, Ac1: 6, Ac2: 7, Ac3: 7, So1: 3, So2: 5, So3: 3 } },
+      HIDE: { code: 'HIDE', cn: '隐藏者', desc: '不轻易展露真实想法，习惯把情绪和想法藏在心里。观察多于表达。',
+        vec: { S1: 5, S2: 6, S3: 6, E1: 5, E2: 4, E3: 6, A1: 5, A2: 5, A3: 6, Ac1: 5, Ac2: 6, Ac3: 5, So1: 4, So2: 4, So3: 4 } },
+      SEEK: { code: 'SEEK', cn: '追寻者', desc: '不断探索和追寻意义。对人生充满好奇，总在寻找答案和方向。',
+        vec: { S1: 6, S2: 6, S3: 7, E1: 5, E2: 6, E3: 5, A1: 6, A2: 7, A3: 7, Ac1: 7, Ac2: 6, Ac3: 6, So1: 6, So2: 6, So3: 6 } },
+      CARE: { code: 'CARE', cn: '关怀者', desc: '富有同理心，关心他人感受。愿意倾听和陪伴，给人温暖和支持。',
+        vec: { S1: 6, S2: 7, S3: 7, E1: 6, E2: 7, E3: 5, A1: 8, A2: 5, A3: 7, Ac1: 6, Ac2: 6, Ac3: 6, So1: 6, So2: 6, So3: 7 } },
+      PLAY: { code: 'PLAY', cn: '乐子人', desc: '享受当下的快乐，不为未来过度焦虑。能发现生活中的趣味，轻松自在。',
+        vec: { S1: 7, S2: 6, S3: 6, E1: 7, E2: 6, E3: 6, A1: 7, A2: 8, A3: 6, Ac1: 5, Ac2: 4, Ac3: 5, So1: 8, So2: 7, So3: 6 } },
+      PLAN: { code: 'PLAN', cn: '规划师', desc: '喜欢未雨绸缪，做事有条理。对目标有清晰规划，按部就班地推进。',
+        vec: { S1: 7, S2: 8, S3: 8, E1: 6, E2: 5, E3: 6, A1: 6, A2: 4, A3: 7, Ac1: 7, Ac2: 9, Ac3: 8, So1: 5, So2: 6, So3: 5 } },
+      REBL: { code: 'REBL', cn: '叛逆者', desc: '不服从常规，有自己的主见。敢于质疑权威，走自己的路。',
+        vec: { S1: 7, S2: 7, S3: 7, E1: 6, E2: 5, E3: 7, A1: 5, A2: 9, A3: 6, Ac1: 6, Ac2: 6, Ac3: 6, So1: 6, So2: 5, So3: 5 } },
+      SAFE: { code: 'SAFE', cn: '安全寻求者', desc: '重视稳定和安全感。偏好可预期的环境，不喜欢太多变化和风险。',
+        vec: { S1: 6, S2: 6, S3: 6, E1: 5, E2: 6, E3: 4, A1: 6, A2: 3, A3: 6, Ac1: 5, Ac2: 6, Ac3: 6, So1: 5, So2: 6, So3: 6 } },
+      PESS: { code: 'PESS', cn: '悲观者', desc: '倾向于看到事情的负面可能。虽然想法偏消极，但往往能预判风险。',
+        vec: { S1: 4, S2: 6, S3: 5, E1: 4, E2: 4, E3: 5, A1: 3, A2: 5, A3: 4, Ac1: 4, Ac2: 5, Ac3: 4, So1: 4, So2: 5, So3: 4 } },
+      FIGH: { code: 'FIGH', cn: '战斗者', desc: '面对困难不退缩，有斗争精神。遇到挑战会迎难而上，越挫越勇。',
+        vec: { S1: 7, S2: 7, S3: 7, E1: 6, E2: 6, E3: 6, A1: 6, A2: 7, A3: 7, Ac1: 8, Ac2: 7, Ac3: 8, So1: 6, So2: 6, So3: 6 } },
+      GIVE: { code: 'GIVE', cn: '给予者', desc: '乐于付出，不求回报。在帮助他人中获得满足，有奉献精神。',
+        vec: { S1: 6, S2: 6, S3: 7, E1: 6, E2: 7, E3: 4, A1: 8, A2: 5, A3: 7, Ac1: 6, Ac2: 6, Ac3: 6, So1: 6, So2: 6, So3: 7 } },
+      PERF: { code: 'PERF', cn: '完美主义者', desc: '追求卓越，对自己要求高。注重细节，希望把事情做到最好。',
+        vec: { S1: 6, S2: 8, S3: 8, E1: 5, E2: 6, E3: 6, A1: 5, A2: 5, A3: 7, Ac1: 8, Ac2: 8, Ac3: 8, So1: 5, So2: 6, So3: 5 } },
+      DGAF: { code: 'DGAF', cn: '无所谓者', desc: '对很多事情都不太在意，心态平和。不轻易被外界影响，保持内心平静。',
+        vec: { S1: 6, S2: 5, S3: 5, E1: 7, E2: 4, E3: 6, A1: 6, A2: 7, A3: 5, Ac1: 4, Ac2: 4, Ac3: 5, So1: 6, So2: 6, So3: 4 } },
+      LOST: { code: 'LOST', cn: '迷失者', desc: '正在寻找方向和答案。对未来有些迷茫，但也在努力探索。',
+        vec: { S1: 4, S2: 4, S3: 4, E1: 4, E2: 5, E3: 5, A1: 5, A2: 6, A3: 4, Ac1: 4, Ac2: 4, Ac3: 4, So1: 5, So2: 5, So3: 5 } },
+      FAKE: { code: 'FAKE', cn: '伪装者', desc: '习惯于隐藏真实自我，戴上面具社交。内心与外在表现可能有较大差异。',
+        vec: { S1: 4, S2: 4, S3: 5, E1: 4, E2: 4, E3: 5, A1: 4, A2: 6, A3: 5, Ac1: 4, Ac2: 5, Ac3: 4, So1: 6, So2: 8, So3: 4 } },
+      CLUE: { code: 'CLUE', cn: ' clueless', desc: '对很多事情不太确定，还在学习和摸索中。保持开放，接受各种可能。',
+        vec: { S1: 5, S2: 4, S3: 5, E1: 5, E2: 5, E3: 5, A1: 6, A2: 6, A3: 5, Ac1: 4, Ac2: 4, Ac3: 4, So1: 5, So2: 5, So3: 5 } },
+      OVER: { code: 'OVER', cn: '过度思考者', desc: '想太多，容易陷入思绪漩涡。分析能力很强，但有时过度思考导致行动力不足。',
+        vec: { S1: 5, S2: 7, S3: 6, E1: 4, E2: 5, E3: 5, A1: 5, A2: 6, A3: 6, Ac1: 5, Ac2: 6, Ac3: 4, So1: 4, So2: 5, So3: 5 } },
+      NEED: { code: 'NEED', cn: '需求者', desc: '需要他人的认可和支持。从外界获得能量，重视人际关系。',
+        vec: { S1: 5, S2: 5, S3: 6, E1: 4, E2: 7, E3: 3, A1: 6, A2: 5, A3: 6, Ac1: 5, Ac2: 5, Ac3: 5, So1: 6, So2: 6, So3: 7 } },
+      REAL: { code: 'REAL', cn: '真实者', desc: '做真实的自己，不伪装。言行一致，表里如一，活得坦诚。',
+        vec: { S1: 7, S2: 8, S3: 8, E1: 6, E2: 6, E3: 6, A1: 7, A2: 6, A3: 7, Ac1: 6, Ac2: 6, Ac3: 6, So1: 6, So2: 5, So3: 6 } }
+    };
+    // 饮酒人格类型
+    const drinkTypes = {
+      SOBE: { code: 'SOBE', cn: '清醒者', desc: '保持清醒，不被欲望左右。有着超乎常人的自制力和定力。' },
+      DRNK: { code: 'DRNK', cn: '饮酒者', desc: '借酒消愁愁更愁。饮酒是你面对世界的方式。' },
+      SIMP: { code: 'SIMP', cn: '纯爱战士', desc: '为爱冲锋陷阵，不计后果。情感浓烈，容易陷得太深。' },
+      LOSR: { code: 'LOSR', cn: '屌丝', desc: '自嘲自黑的乐天派。表面摆烂，内心仍有期待。' },
+      IDOT: { code: 'IDOT', cn: '傻乐', desc: '简单快乐，想得少睡得好。活在当下，不为明天焦虑。' }
+    };
+
+    // 类型图片（占位符）
+    const TYPE_IMAGES = {
+      CTRL: './image/ctrl.png', FLEX: './image/flex.png', DEPP: './image/depp.png',
+      MASK: './image/mask.png', CYNI: './image/cyni.png', HOPE: './image/hope.png',
+      SHIT: './image/shit.png', LONE: './image/lone.png', HIDE: './image/hide.png',
+      SEEK: './image/seek.png', CARE: './image/care.png', PLAY: './image/play.png',
+      PLAN: './image/plan.png', REBL: './image/rebl.png', SAFE: './image/safe.png',
+      PESS: './image/pess.png', FIGH: './image/figh.png', GIVE: './image/give.png',
+      PERF: './image/perf.png', DGAF: './image/dgaf.png', LOST: './image/lost.png',
+      FAKE: './image/fake.png', CLUE: './image/clue.png', OVER: './image/over.png',
+      NEED: './image/need.png', REAL: './image/real.png', SOBE: './image/sobe.png',
+      DRNK: './image/drnk.png', SIMP: './image/simp.png', LOSR: './image/losr.png',
+      IDOT: './image/idot.png'
+    };
+
+    const app = { answers: {}, shuffledQuestions: [], previewMode: false };
+
+    function shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function getOptionText(qid, val) {
+      const map = {
+        q1: ['不认同', '中立', '认同'], q2: ['不认同', '中立', '认同'], q3: ['不认同', '中立', '认同'],
+        q4: ['不认同', '中立', '认同'], q5: ['不认同', '中立', '认同'], q6: ['不认同', '中立', '认同'],
+        q7: ['不认同', '中立', '认同'], q8: ['不认同', '中立', '认同'], q9: ['并没有', '也许？', '是的！'],
+        q10: ['就算ta再优秀我也不会陷入太深', '介于两者之间', '会非常珍惜ta'],
+        q11: ['那很爽了', '都行无所谓', '更喜欢保留独立空间'],
+        q12: ['更喜欢依赖与被依赖', '看情况', '是的！'],
+        q13: ['不认同', '中立', '认同'], q14: ['不认同', '中立', '认同'], q15: ['不认同', '中立', '认同'],
+        q16: ['认同', '保持中立', '不认同'], q17: ['不认同', '中立', '认同'], q18: ['认同', '中立', '不认同'],
+        q19: ['不认同', '中立', '认同'], q20: ['被逼到最后确实执行力超强', '有时候吧', '事情本该被推进'],
+        q21: ['不认同', '中立', '认同'], q22: ['选A', '选B', '选C'],
+        q23: ['邪恶的人心更多', '也许吧', '好人更多'], q24: ['隐瞒了我', '摇摆', '真的不舒服'],
+        q25: ['真见面有点忐忑', '能聊就聊', '打扮一番热情聊天'], q26: ['保持距离', '能玩就玩', '热情聊天'],
+        q27: ['认同', '中立', '不认同'], q28: ['不认同', '中立', '认同'],
+        q29: ['情况较少', '碍于情面', '不想让人知道'], q30: ['不认同', '中立', '认同']
+      };
+      return map[qid]?.[val - 1] || '';
+    }
+
+    function renderQuestions() {
+      const container = document.getElementById('questionList');
+      container.innerHTML = app.shuffledQuestions.map((q, idx) => {
+        const qnum = idx + 1;
+        const isSpecial = q.dim === 'special';
+        const badge = isSpecial ? '补充题' : `第 ${qnum} 题`;
+        const meta = isSpecial ? '维度已隐藏' : (dimensionMeta[q.dim]?.model || '维度已隐藏');
+        
+        let optionsHtml = '';
+        if (isSpecial) {
+          const opts = q.id === 'drink_q1' 
+            ? ['吃喝拉撒', '艺术爱好', '饮酒', '健身']
+            : ['小酌', '买醉', '来者不拒', '只喝白的', '有酒必喝'];
+          const codes = ['A', 'B', 'C', 'D', 'E'];
+          optionsHtml = opts.map((opt, i) => `
+            <label class="option">
+              <input type="radio" name="${q.id}" value="${i + 1}">
+              <div class="option-code">${codes[i]}</div><div>${opt}</div>
+            </label>
+          `).join('');
+        } else {
+          const codes = ['A', 'B', 'C'];
+          const texts = [getOptionText(q.id, 1), getOptionText(q.id, 2), getOptionText(q.id, 3)];
+          optionsHtml = texts.map((text, i) => `
+            <label class="option">
+              <input type="radio" name="${q.id}" value="${i + 1}">
+              <div class="option-code">${codes[i]}</div><div>${text}</div>
+            </label>
+          `).join('');
+        }
+
+        return `<article class="question"><div class="question-meta"><div class="badge">${badge}</div><div>${meta}</div></div>
+          <div class="question-title">${q.text}</div><div class="options">${optionsHtml}</div></article>`;
+      }).join('');
+
+      container.querySelectorAll('input[type="radio"]').forEach(radio => {
+        radio.addEventListener('change', updateProgress);
+      });
+      updateProgress();
+    }
+
+    function updateProgress() {
+      const total = app.shuffledQuestions.length;
+      let answered = 0;
+      app.shuffledQuestions.forEach(q => {
+        const name = q.dim === 'special' ? q.id : q.id;
+        const selected = document.querySelector(`input[name="${name}"]:checked`);
+        if (selected) {
+          app.answers[name] = parseInt(selected.value);
+          answered++;
+        }
+      });
+      const pct = Math.round((answered / total) * 100);
+      document.getElementById('progressBar').style.width = pct + '%';
+      document.getElementById('progressText').textContent = `${answered} / ${total}`;
+    }
+
+    function computeResult() {
+      const dimScores = {}; dimensionOrder.forEach(d => dimScores[d] = 0);
+      const dimCounts = {}; dimensionOrder.forEach(d => dimCounts[d] = 0);
+
+      app.shuffledQuestions.forEach(q => {
+        if (q.dim === 'special') return;
+        const val = app.answers[q.id];
+        if (val) { dimScores[q.dim] += val; dimCounts[q.dim]++; }
+      });
+
+      const rawScores = {};
+      dimensionOrder.forEach(d => {
+        const avg = dimCounts[d] > 0 ? dimScores[d] / dimCounts[d] : 2;
+        rawScores[d] = Math.round(avg * 3.33);
+      });
+
+      const typeScores = [];
+      for (const [key, type] of Object.entries(types)) {
+        let distance = 0;
+        dimensionOrder.forEach(d => {
+          const diff = (rawScores[d] || 5) - (type.vec[d] || 5);
+          distance += diff * diff;
+        });
+        const match = Math.max(0, Math.round(100 - Math.sqrt(distance) * 3));
+        typeScores.push({ key, type, match });
+      }
+      typeScores.sort((a, b) => b.match - a.match);
+      const bestNormal = typeScores[0];
+
+      const drinkQ1 = app.answers['drink_q1'];
+      let finalType = bestNormal.type, modeKicker = '你的主类型', 
+          badge = `匹配度 ${bestNormal.match}%`, sub = '基于十五维度深度分析', special = false;
+
+      if (drinkQ1 === 3) {
+        special = true;
+        const drinkQ2 = app.answers['drink_q2'] || 1;
+        if (drinkQ2 >= 4) { finalType = drinkTypes.DRNK; modeKicker = '隐藏人格 · 饮酒者'; sub = '检测到饮酒倾向'; }
+        else if (bestNormal.key === 'DEPP' || bestNormal.key === 'NEED') { finalType = drinkTypes.SIMP; modeKicker = '隐藏人格 · 纯爱战士'; sub = '情感浓度超标'; }
+        else if (bestNormal.key === 'SHIT' || bestNormal.key === 'LOST') { finalType = drinkTypes.LOSR; modeKicker = '隐藏人格 · 屌丝'; sub = '自嘲指数爆表'; }
+        else { finalType = drinkTypes.IDOT; modeKicker = '隐藏人格 · 傻乐'; sub = '快乐很简单'; }
+        badge = '特殊类型触发';
+      }
+
+      return { rawScores, levels: rawScores, ranked: typeScores.slice(0, 3), bestNormal, finalType, modeKicker, badge, sub, special };
+    }
+
+    function renderDimList(result) {
+      const dimList = document.getElementById('dimList');
+      const explanations = { 1:'较低水平',2:'较低水平',3:'中等水平',4:'中等水平',5:'中等水平',6:'中等偏上',7:'较高水平',8:'较高水平',9:'很高水平',10:'极高水平' };
+      dimList.innerHTML = dimensionOrder.map(dim => {
+        const score = result.rawScores[dim];
+        const meta = dimensionMeta[dim];
+        return `<div class="dim-item"><div class="dim-item-top"><div class="dim-item-name">${meta.name}</div><div class="dim-item-score">${score}/10</div></div><p>${explanations[score]}</p></div>`;
+      }).join('');
+    }
+
+    function renderResult() {
+      const result = computeResult();
+      const type = result.finalType;
+      document.getElementById('resultModeKicker').textContent = result.modeKicker;
+      document.getElementById('resultTypeName').textContent = `${type.code} · ${type.cn}`;
+      document.getElementById('matchBadge').textContent = result.badge;
+      document.getElementById('resultTypeSub').textContent = result.sub;
+      document.getElementById('resultDesc').textContent = type.desc;
+      document.getElementById('posterCaption').textContent = type.desc.slice(0, 80) + '...';
+
+      const posterBox = document.getElementById('posterBox');
+      const posterImage = document.getElementById('posterImage');
+      const imageSrc = TYPE_IMAGES[type.code];
+      if (imageSrc) {
+        posterImage.src = imageSrc;
+        posterImage.alt = `${type.code} · ${type.cn}`;
+        posterBox.classList.remove('no-image');
+      } else { posterBox.classList.add('no-image'); }
+
+      document.getElementById('funNote').textContent = result.special
+        ? '本测试仅供娱乐。隐藏人格和傻乐兜底都属于作者故意埋的损招，请勿当成医学、心理学依据。'
+        : '本测试仅供娱乐，别拿它当诊断、面试、相亲、分手、招魂、算命或人生判决书。';
+      renderDimList(result);
+      showScreen('result');
+    }
+
+    function startTest() {
+      app.answers = {};
+      const regularQs = rawQuestions.map((q, i) => ({...q, id: `q${i + 1}`}));
+      const shuffled = shuffle(regularQs);
+      const insertIdx = Math.floor(Math.random() * 15) + 10;
+      app.shuffledQuestions = [...shuffled.slice(0, insertIdx), specialQuestions[0], ...shuffled.slice(insertIdx)];
+      renderQuestions();
+      showScreen('test');
+    }
+
+    document.getElementById('startBtn').addEventListener('click', startTest);
+    document.getElementById('backIntroBtn').addEventListener('click', () => showScreen('intro'));
+    document.getElementById('submitBtn').addEventListener('click', renderResult);
+    document.getElementById('restartBtn').addEventListener('click', startTest);
+    document.getElementById('toTopBtn').addEventListener('click', () => showScreen('intro'));
+  </script>
+</body>
+</html>
