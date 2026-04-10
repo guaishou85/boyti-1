@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BoyTi · 直男人格测试</title>
-    <meta name="description" content="20道题，一次性回答，精准剖析你的直男人格成分。">
+    <title>BoyTi · 直男网梗人格测试</title>
+    <meta name="description" content="20道题，测测你是爹味重还是纯爱战士？全网最懂的直男人格鉴定。">
     
     <!-- Bootstrap 5 + Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -27,16 +27,16 @@
         .card-test {
             border: none;
             border-radius: 32px;
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(12px);
             box-shadow: 0 20px 40px -12px rgba(0, 20, 60, 0.15);
         }
         [data-bs-theme="dark"] .card-test {
-            background: rgba(20, 30, 50, 0.8);
+            background: rgba(20, 30, 50, 0.85);
             box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.5);
         }
         
-        /* ✅ 题目卡片 — 层次感增强 */
+        /* 题目卡片 */
         .question-card {
             border-radius: 24px;
             background: rgba(255, 255, 255, 0.75);
@@ -51,7 +51,6 @@
         .question-card:hover {
             box-shadow: 0 12px 24px -8px rgba(79, 70, 229, 0.12);
         }
-        /* 分隔装饰线 — 增强层次 */
         .question-card::after {
             content: '';
             display: block;
@@ -65,7 +64,7 @@
             opacity: 0.6;
         }
         .question-card:last-child::after {
-            display: none;  /* 最后一题不加分隔线 */
+            display: none;
         }
         
         [data-bs-theme="dark"] .question-card {
@@ -111,6 +110,7 @@
             color: white !important;
         }
         
+        /* 结果页头像 */
         .result-avatar {
             width: 140px;
             height: 140px;
@@ -122,6 +122,7 @@
             margin: 0 auto 1.5rem;
             box-shadow: 0 16px 30px -8px rgba(79, 70, 229, 0.4);
         }
+        
         .badge-type {
             background: #e0e7ff;
             color: #3730a3;
@@ -133,6 +134,7 @@
             background: #312e81;
             color: #c7d2fe;
         }
+        
         .btn-gradient {
             background: linear-gradient(145deg, #4f46e5, #7c3aed);
             border: none;
@@ -149,6 +151,7 @@
             transform: translateY(-2px);
             box-shadow: 0 14px 26px -8px #4f46e5;
         }
+        
         .theme-toggle {
             position: fixed;
             bottom: 20px;
@@ -161,11 +164,25 @@
             box-shadow: 0 8px 20px rgba(0,0,0,0.1);
             z-index: 1000;
         }
+        
         .footer-note {
             color: #64748b;
         }
         [data-bs-theme="dark"] .footer-note {
             color: #94a3b8;
+        }
+
+        /* 梗解释样式 */
+        .meme-explain {
+            font-size: 0.9rem;
+            color: #6b7280;
+            border-left: 3px solid #a5b4fc;
+            padding-left: 12px;
+            margin-top: 8px;
+        }
+        [data-bs-theme="dark"] .meme-explain {
+            color: #9ca3af;
+            border-left-color: #6366f1;
         }
     </style>
 </head>
@@ -181,7 +198,7 @@
     (function(){
         'use strict';
 
-        // ---------- 20题题库 (男生向) ----------
+        // ---------- 20题题库 (保持不变) ----------
         const QUESTION_BANK = [
             { id: 1, text: "周末下午，你更倾向于怎么过？", options: [{ text: "约兄弟开黑或者打球，人越多越热闹", trait: "E" }, { text: "宅家打游戏/看番/刷手机，享受独处", trait: "I" }] },
             { id: 2, text: "朋友聚会时，你通常是？", options: [{ text: "气氛组，带动话题，聊个不停", trait: "E" }, { text: "安静听大家说，偶尔插几句", trait: "I" }] },
@@ -205,26 +222,155 @@
             { id: 20, text: "购物时，你更倾向于？", options: [{ text: "列好清单，直奔目标，买完就走", trait: "J" }, { text: "随意逛逛，看到喜欢的再买", trait: "P" }] }
         ];
 
-        // 结果类型库 (头像用 Emoji + 渐变)
+        // ---------- 新版网梗人格数据 (同步代号、原特质、梗名、副标题、梗解释) ----------
         const RESULT_TYPES = [
-            { code: "ESTJ", name: "钢铁司令官", subtitle: "秩序守护者", description: "你天生就是当领导的料，做事雷厉风行，原则性强。你的直男癌指数不低，但靠谱程度极高。", traits: { straightScore: 88, straightComment: "直来直去", eqScore: 35, eqComment: "需要多哄哄" }, avatarEmoji: "👨‍✈️", avatarColor: "#3b5998" },
-            { code: "ISTJ", name: "沉默质检员", subtitle: "细节偏执狂", description: "你是最可靠的执行者，沉默寡言但内心自有丘壑。你的认真是一种别样的魅力，但有时候真的会气死人。", traits: { straightScore: 92, straightComment: "直线思维", eqScore: 28, eqComment: "凭实力单身" }, avatarEmoji: "🔍", avatarColor: "#4a5568" },
-            { code: "ESFJ", name: "暖心老大哥", subtitle: "妇女之友", description: "你是团队里的粘合剂，热情、细心、照顾每个人的感受。你的直男指数很低，堪称男性楷模。", traits: { straightScore: 25, straightComment: "暖男本男", eqScore: 95, eqComment: "中央空调级别" }, avatarEmoji: "🤗", avatarColor: "#e67e22" },
-            { code: "ISFJ", name: "温柔守护者", subtitle: "默默付出型", description: "你就像一杯温水，不烫不凉，但最解渴。你的直男表现就是：永远在做事，永远不会说情话。", traits: { straightScore: 55, straightComment: "行动派", eqScore: 80, eqComment: "润物细无声" }, avatarEmoji: "🛡️", avatarColor: "#27ae60" },
-            { code: "ESTP", name: "社交悍匪", subtitle: "全场最靓的仔", description: "你胆大心细，享受刺激，是聚会上最会玩的人。你的直男指数波动很大，取决于你当时的心情。", traits: { straightScore: 60, straightComment: "直率", eqScore: 75, eqComment: "见人说人话" }, avatarEmoji: "😎", avatarColor: "#f1c40f" },
-            { code: "ISTP", name: "高冷手艺人", subtitle: "人狠话不多", description: "你是行走的工具箱，修电脑、换灯泡、组装家具无所不能。女朋友跟你抱怨工作累，你会直接问：“需要我给你重装系统吗？”", traits: { straightScore: 90, straightComment: "工具人属性", eqScore: 20, eqComment: "别让我猜" }, avatarEmoji: "🔧", avatarColor: "#7f8c8d" },
-            { code: "ESFP", name: "人间小太阳", subtitle: "快乐源泉", description: "你是天生的表演家，有你的地方就有欢笑。直男？不存在的，你比女生还会玩。", traits: { straightScore: 15, straightComment: "姐妹相称", eqScore: 98, eqComment: "气氛组担当" }, avatarEmoji: "🎉", avatarColor: "#e84393" },
-            { code: "ISFP", name: "文艺闷骚男", subtitle: "内心有片海", description: "你外表安静，内心却有着丰富的艺术细胞和感受力。直男指数极低，但容易陷入自己的小世界。", traits: { straightScore: 20, straightComment: "细腻敏感", eqScore: 85, eqComment: "懂得倾听" }, avatarEmoji: "🎨", avatarColor: "#6c5ce7" },
-            { code: "ENTJ", name: "霸道总裁", subtitle: "天生的王者", description: "你有极强的野心和控制欲，目标明确，行动力爆表。你的直男癌是那种“我不要你觉得，我要我觉得”的类型。", traits: { straightScore: 85, straightComment: "霸道", eqScore: 40, eqComment: "爱你才管你" }, avatarEmoji: "👑", avatarColor: "#c0392b" },
-            { code: "INTJ", name: "幕后黑手", subtitle: "独立思考者", description: "你是完美的策略家，理性、冷静、有远见。你的直男表现就是：用思维导图分析感情问题。", traits: { straightScore: 95, straightComment: "理智到冷漠", eqScore: 15, eqComment: "感情是啥" }, avatarEmoji: "♟️", avatarColor: "#2c3e50" },
-            { code: "ENTP", name: "嘴强王者", subtitle: "逻辑鬼才", description: "你聪明、机智、热衷于辩论。虽然嘴欠，但脑子好使。", traits: { straightScore: 80, straightComment: "杠精本精", eqScore: 30, eqComment: "赢了道理输了人" }, avatarEmoji: "🤓", avatarColor: "#d35400" },
-            { code: "INTP", name: "理论科学家", subtitle: "脑洞星人", description: "你生活在自己的逻辑世界里，对一切事物都充满好奇。你的直男表现堪称教科书级别的“不解风情”。", traits: { straightScore: 98, straightComment: "榆木疙瘩", eqScore: 10, eqComment: "注孤生潜力股" }, avatarEmoji: "🧪", avatarColor: "#8e44ad" },
-            { code: "ENFJ", name: "灵魂导师", subtitle: "精神领袖", description: "你富有魅力，善于鼓舞人心。你是很多女生的“男闺蜜”，因为太懂她们了。", traits: { straightScore: 30, straightComment: "知心大哥", eqScore: 95, eqComment: "共情能力MAX" }, avatarEmoji: "📖", avatarColor: "#16a085" },
-            { code: "INFJ", name: "神秘主义者", subtitle: "理想主义战士", description: "你有着深刻的洞察力和坚定的价值观。虽然看起来很直，但实际上心思细腻。", traits: { straightScore: 40, straightComment: "外冷内热", eqScore: 90, eqComment: "灵魂洞察者" }, avatarEmoji: "🔮", avatarColor: "#2980b9" },
-            { code: "ENFP", name: "快乐小狗", subtitle: "社交牛逼症", description: "你热情、奔放、充满好奇心。直男？你比女生还感性。", traits: { straightScore: 10, straightComment: "感性动物", eqScore: 98, eqComment: "人见人爱" }, avatarEmoji: "🐶", avatarColor: "#f39c12" },
-            { code: "INFP", name: "治愈系少年", subtitle: "永远的梦想家", description: "你温柔、善良、富有同情心。你的直男指数为零，因为你本身就是个需要被呵护的宝宝。", traits: { straightScore: 5, straightComment: "小仙男", eqScore: 99, eqComment: "人间天使" }, avatarEmoji: "🌸", avatarColor: "#9b59b6" }
+            {
+                code: "ESTJ",
+                originalTrait: "强势、爱指挥",
+                name: "爹味重",
+                subtitle: "听叔一句劝",
+                description: "指喜欢教你做事、自带长辈气场的“人间爹味”感。你天生就是当领导的料，做事雷厉风行，原则性强。你的直男癌指数不低，但靠谱程度极高。",
+                traits: { straightScore: 88, straightComment: "爹味十足", eqScore: 35, eqComment: "少说教多倾听" },
+                avatarEmoji: "👨‍✈️", avatarColor: "#3b5998"
+            },
+            {
+                code: "ISTJ",
+                originalTrait: "严谨、较真",
+                name: "老实人",
+                subtitle: "你说得对，但是...",
+                description: "就是那种被发好人卡、做事一板一眼的经典直男形象。你是最可靠的执行者，沉默寡言但内心自有丘壑。你的认真是一种别样的魅力，但有时候真的会气死人。",
+                traits: { straightScore: 92, straightComment: "实在过头", eqScore: 28, eqComment: "凭实力单身" },
+                avatarEmoji: "🔍", avatarColor: "#4a5568"
+            },
+            {
+                code: "ESFJ",
+                originalTrait: "操心、热心",
+                name: "显眼包",
+                subtitle: "放着我来！",
+                description: "热情爱张罗，不管在哪都是最忙活、最操心的那个。你是团队里的粘合剂，记得住兄弟生日、女朋友喜好。你的直男指数很低，堪称男性楷模。",
+                traits: { straightScore: 25, straightComment: "暖男本男", eqScore: 95, eqComment: "中央空调级别" },
+                avatarEmoji: "🤗", avatarColor: "#e67e22"
+            },
+            {
+                code: "ISFJ",
+                originalTrait: "沉默、付出",
+                name: "纯爱战士",
+                subtitle: "都在心里",
+                description: "不善于表达，只会用行动默默证明，应声倒地的纯爱战神。你就像一杯温水，不烫不凉，但最解渴。你的直男表现就是：永远在做事，永远不会说情话。",
+                traits: { straightScore: 55, straightComment: "行动派", eqScore: 80, eqComment: "润物细无声" },
+                avatarEmoji: "🛡️", avatarColor: "#27ae60"
+            },
+            {
+                code: "ESTP",
+                originalTrait: "爱玩、社牛",
+                name: "该溜子",
+                subtitle: "哪有局？带一个",
+                description: "到处凑热闹、哪里人多往哪钻，社交悍匪的代名词。你胆大心细，享受刺激，是聚会上最会玩的人。直男指数波动很大，取决于心情。",
+                traits: { straightScore: 60, straightComment: "直率", eqScore: 75, eqComment: "见人说人话" },
+                avatarEmoji: "😎", avatarColor: "#f1c40f"
+            },
+            {
+                code: "ISTP",
+                originalTrait: "动手强、话少",
+                name: "手艺人",
+                subtitle: "别bb，看操作",
+                description: "人狠话不多，遇事不决先拆机的硬核技术流。你是行走的工具箱，能用行动解决的事，绝不多BB。",
+                traits: { straightScore: 90, straightComment: "工具人属性", eqScore: 20, eqComment: "别让我猜" },
+                avatarEmoji: "🔧", avatarColor: "#7f8c8d"
+            },
+            {
+                code: "ESFP",
+                originalTrait: "人来疯、表现欲",
+                name: "戏精",
+                subtitle: "主角光环已上线",
+                description: "有人的地方就是舞台，必须整点活让大家看看。你是天生的表演家，有你的地方就有欢笑。直男？不存在的。",
+                traits: { straightScore: 15, straightComment: "姐妹相称", eqScore: 98, eqComment: "气氛组担当" },
+                avatarEmoji: "🎉", avatarColor: "#e84393"
+            },
+            {
+                code: "ISFP",
+                originalTrait: "内敛、敏感",
+                name: "emo怪",
+                subtitle: "网易云十年黑胶",
+                description: "夜深人静时情绪泛滥，极易陷入伤感或文艺氛围。你外表安静，内心有丰富的艺术细胞。直男指数极低。",
+                traits: { straightScore: 20, straightComment: "细腻敏感", eqScore: 85, eqComment: "懂得倾听" },
+                avatarEmoji: "🎨", avatarColor: "#6c5ce7"
+            },
+            {
+                code: "ENTJ",
+                originalTrait: "霸道、强势",
+                name: "狼人",
+                subtitle: "比狠人多一点",
+                description: "做事雷厉风行、目标感极强，压迫感拉满。你有极强的野心和控制欲，直男癌是那种“我不要你觉得，我要我觉得”的类型。",
+                traits: { straightScore: 85, straightComment: "霸道", eqScore: 40, eqComment: "爱你才管你" },
+                avatarEmoji: "👑", avatarColor: "#c0392b"
+            },
+            {
+                code: "INTJ",
+                originalTrait: "高冷、理智",
+                name: "鉴茶师",
+                subtitle: "别演，看穿了",
+                description: "头脑极其清醒，任何套路在他眼里都像透明的一样。你是完美的策略家，理性、冷静，谈恋爱都像在下一盘大棋。",
+                traits: { straightScore: 95, straightComment: "理智到冷漠", eqScore: 15, eqComment: "感情是啥" },
+                avatarEmoji: "♟️", avatarColor: "#2c3e50"
+            },
+            {
+                code: "ENTP",
+                originalTrait: "好辩、机智",
+                name: "杠精",
+                subtitle: "难道只有我觉得？",
+                description: "享受逻辑对线，反驳你是为了让你进步（嘴硬版）。你聪明、机智，虽然嘴欠，但脑子好使。",
+                traits: { straightScore: 80, straightComment: "杠精本精", eqScore: 30, eqComment: "赢了道理输了人" },
+                avatarEmoji: "🤓", avatarColor: "#d35400"
+            },
+            {
+                code: "INTP",
+                originalTrait: "逻辑怪、抽离",
+                name: "淡人",
+                subtitle: "随便，都行，无所谓",
+                description: "主打一个活着就行，对万事万物提不起太大兴趣。你生活在自己的逻辑世界里，对外界反应迟钝。",
+                traits: { straightScore: 98, straightComment: "榆木疙瘩", eqScore: 10, eqComment: "注孤生潜力股" },
+                avatarEmoji: "🧪", avatarColor: "#8e44ad"
+            },
+            {
+                code: "ENFJ",
+                originalTrait: "共情、暖男",
+                name: "暖男",
+                subtitle: "多喝热水分你半杯",
+                description: "真正的中央空调，不仅会说多喝热水，还会帮你倒好。你是很多女生的“男闺蜜”，因为太懂她们了。",
+                traits: { straightScore: 30, straightComment: "知心大哥", eqScore: 95, eqComment: "共情能力MAX" },
+                avatarEmoji: "📖", avatarColor: "#16a085"
+            },
+            {
+                code: "INFJ",
+                originalTrait: "深刻、神秘",
+                name: "扫地僧",
+                subtitle: "看透不说透",
+                description: "外表平平无奇，内心全是哲理，一开口就是降维打击。你有着深刻的洞察力，虽然看起来很直，实际上心思细腻。",
+                traits: { straightScore: 40, straightComment: "外冷内热", eqScore: 90, eqComment: "灵魂洞察者" },
+                avatarEmoji: "🔮", avatarColor: "#2980b9"
+            },
+            {
+                code: "ENFP",
+                originalTrait: "快乐、奔放",
+                name: "快乐小狗",
+                subtitle: "贴贴！",
+                description: "像金毛一样热情，见到谁都想摇尾巴贴贴。你热情、奔放，直男？你比女生还感性。",
+                traits: { straightScore: 10, straightComment: "感性动物", eqScore: 98, eqComment: "人见人爱" },
+                avatarEmoji: "🐶", avatarColor: "#f39c12"
+            },
+            {
+                code: "INFP",
+                originalTrait: "柔软、善良",
+                name: "小脆皮",
+                subtitle: "别骂了，要碎了",
+                description: "内心极其柔软敏感，网络上的脆弱“电子蝴蝶”。你温柔、善良，直男指数为零，因为你本身就是个需要被呵护的宝宝。",
+                traits: { straightScore: 5, straightComment: "小仙男", eqScore: 99, eqComment: "人间天使" },
+                avatarEmoji: "🌸", avatarColor: "#9b59b6"
+            }
         ];
 
+        // ---------- 全局状态 ----------
         const app = document.getElementById('app');
         let currentView = 'home';
         let answers = {};
@@ -242,6 +388,7 @@
             else if (currentView === 'result') renderResult();
         });
 
+        // 计算结果
         function calculateResult() {
             let scores = { E:0, I:0, S:0, N:0, T:0, F:0, J:0, P:0 };
             Object.entries(answers).forEach(([qid, optIdx]) => {
@@ -258,23 +405,29 @@
             return RESULT_TYPES.find(t => t.code === typeCode) || RESULT_TYPES[0];
         }
 
+        // 渲染首页
         function renderHome() {
             app.innerHTML = `
                 <div class="row justify-content-center">
                     <div class="col-12 col-md-10 col-lg-8">
                         <div class="card card-test p-4 p-md-5 text-center">
                             <div class="mb-4 display-1">🧔‍♂️</div>
-                            <h1 class="display-5 fw-bold mb-3">你的直男人格是什么？</h1>
-                            <p class="lead mb-4">20道精选题目，一次性回答，看看你的 <strong>BoyTi</strong> 类型。</p>
+                            <h1 class="display-5 fw-bold mb-3">你的直男网梗人格是？</h1>
+                            <p class="lead mb-4">20道精选题目，测测你是爹味重还是纯爱战士？</p>
                             <button id="startBtn" class="btn btn-gradient btn-lg px-5 py-3 mt-3">开始测试 <i class="bi bi-arrow-right ms-2"></i></button>
                             <p class="footer-note mt-5 small"><i class="bi bi-chat-quote"></i> 别想太多，凭直觉选最像你的那个。</p>
                         </div>
                     </div>
                 </div>
             `;
-            document.getElementById('startBtn').addEventListener('click', () => { currentView = 'quiz'; answers = {}; renderQuiz(); });
+            document.getElementById('startBtn').addEventListener('click', () => {
+                currentView = 'quiz';
+                answers = {};
+                renderQuiz();
+            });
         }
 
+        // 渲染答题页
         function renderQuiz() {
             let questionsHtml = '';
             QUESTION_BANK.forEach((q, idx) => {
@@ -289,50 +442,143 @@
             const answeredCount = Object.keys(answers).length;
             const progressPercent = (answeredCount / QUESTION_BANK.length) * 100;
             app.innerHTML = `
-                <div class="row justify-content-center"><div class="col-12 col-md-10 col-lg-8"><div class="card card-test p-4 p-md-5">
-                    <div class="d-flex align-items-center justify-content-between mb-3"><h3 class="fw-bold mb-0"><i class="bi bi-pencil-square me-2"></i>答题卡</h3><span class="badge rounded-pill px-4 py-2">${answeredCount}/${QUESTION_BANK.length} 题</span></div>
-                    <div class="progress mb-4" style="height:8px"><div class="progress-bar bg-primary" style="width:${progressPercent}%"></div></div>
-                    <div id="questionsContainer">${questionsHtml}</div>
-                    <div class="d-grid mt-4"><button id="submitQuizBtn" class="btn btn-gradient btn-lg py-3">查看结果 <i class="bi bi-bar-chart-fill ms-2"></i></button></div>
-                    <button id="backHomeBtn" class="btn btn-link text-secondary mt-3"><i class="bi bi-arrow-left"></i> 返回首页</button>
-                </div></div></div>
+                <div class="row justify-content-center">
+                    <div class="col-12 col-md-10 col-lg-8">
+                        <div class="card card-test p-4 p-md-5">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <h3 class="fw-bold mb-0"><i class="bi bi-pencil-square me-2"></i>答题卡</h3>
+                                <span class="badge rounded-pill px-4 py-2">${answeredCount}/${QUESTION_BANK.length} 题</span>
+                            </div>
+                            <div class="progress mb-4" style="height:8px">
+                                <div class="progress-bar bg-primary" style="width:${progressPercent}%"></div>
+                            </div>
+                            <div id="questionsContainer">${questionsHtml}</div>
+                            <div class="d-grid mt-4">
+                                <button id="submitQuizBtn" class="btn btn-gradient btn-lg py-3">查看结果 <i class="bi bi-bar-chart-fill ms-2"></i></button>
+                            </div>
+                            <button id="backHomeBtn" class="btn btn-link text-secondary mt-3"><i class="bi bi-arrow-left"></i> 返回首页</button>
+                        </div>
+                    </div>
+                </div>
             `;
+
             document.querySelectorAll('.option-btn').forEach(btn => {
-                btn.addEventListener('click', () => { answers[btn.dataset.qid] = parseInt(btn.dataset.optindex); renderQuiz(); });
+                btn.addEventListener('click', () => {
+                    answers[btn.dataset.qid] = parseInt(btn.dataset.optindex);
+                    renderQuiz();
+                });
             });
+
             document.getElementById('submitQuizBtn').addEventListener('click', () => {
-                if (Object.keys(answers).length < QUESTION_BANK.length) { alert(`还有 ${QUESTION_BANK.length - Object.keys(answers).length} 题未答`); return; }
-                finalType = calculateResult(); currentView = 'result'; renderResult();
+                if (Object.keys(answers).length < QUESTION_BANK.length) {
+                    alert(`还有 ${QUESTION_BANK.length - Object.keys(answers).length} 题未答`);
+                    return;
+                }
+                finalType = calculateResult();
+                currentView = 'result';
+                renderResult();
             });
-            document.getElementById('backHomeBtn').addEventListener('click', () => { currentView = 'home'; renderHome(); });
+
+            document.getElementById('backHomeBtn').addEventListener('click', () => {
+                currentView = 'home';
+                renderHome();
+            });
         }
 
+        // 渲染结果页 (包含原特质、梗名、副标题、梗解释)
         async function renderResult() {
             const type = finalType;
+            const isDark = document.body.getAttribute('data-bs-theme') === 'dark';
+            
             app.innerHTML = `
-                <div class="row justify-content-center"><div class="col-12 col-md-10 col-lg-8"><div id="resultCard" class="card card-test p-4 p-md-5 text-center">
-                    <div class="result-avatar" style="background: radial-gradient(circle at 30% 30%, ${type.avatarColor}dd, ${type.avatarColor}99);"><span class="display-3">${type.avatarEmoji}</span></div>
-                    <h2 class="fw-bold mb-2">${type.name}</h2><p class="fs-5 text-secondary mb-3">「${type.subtitle}」</p><span class="badge-type mb-4">${type.code}</span>
-                    <div class="bg-light bg-opacity-25 p-4 rounded-4 mb-4"><p class="lead mb-0">${type.description}</p></div>
-                    <div class="row g-3 mb-4"><div class="col-6"><div class="p-3 rounded-4 h-100"><div class="text-secondary small">直男指数</div><div class="display-6 fw-bold text-primary">${type.traits.straightScore}%</div><div class="small">${type.traits.straightComment}</div></div></div>
-                    <div class="col-6"><div class="p-3 rounded-4 h-100"><div class="text-secondary small">情商潜力</div><div class="display-6 fw-bold text-success">${type.traits.eqScore}%</div><div class="small">${type.traits.eqComment}</div></div></div></div>
-                    <div class="d-flex flex-wrap gap-3 justify-content-center"><button id="shareBtn" class="btn btn-gradient px-4 py-2"><i class="bi bi-download me-2"></i>保存结果卡片</button>
-                    <button id="retakeBtn" class="btn btn-outline-secondary rounded-pill px-4 py-2"><i class="bi bi-arrow-repeat me-2"></i>重新测试</button></div>
-                    <p class="footer-note small mt-4">* 测试结果仅供娱乐，每个直男都是潜力股。</p>
-                </div></div></div>
+                <div class="row justify-content-center">
+                    <div class="col-12 col-md-10 col-lg-8">
+                        <div id="resultCard" class="card card-test p-4 p-md-5 text-center">
+                            <div class="result-avatar" style="background: radial-gradient(circle at 30% 30%, ${type.avatarColor}dd, ${type.avatarColor}99);">
+                                <span class="display-3">${type.avatarEmoji}</span>
+                            </div>
+                            
+                            <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
+                                <span class="badge-type">${type.code}</span>
+                                <span class="text-secondary">· ${type.originalTrait}</span>
+                            </div>
+                            
+                            <h2 class="fw-bold mb-1">${type.name}</h2>
+                            <p class="fs-5 text-secondary mb-3">「${type.subtitle}」</p>
+                            
+                            <div class="meme-explain text-start mb-4">
+                                <i class="bi bi-chat-quote-fill me-1"></i> ${type.description.split('。')[0]}。
+                            </div>
+                            
+                            <div class="bg-light bg-opacity-25 p-4 rounded-4 mb-4" style="background: ${isDark ? '#1e293b' : '#f8fafc'}">
+                                <p class="lead mb-0">${type.description}</p>
+                            </div>
+                            
+                            <div class="row g-3 mb-4">
+                                <div class="col-6">
+                                    <div class="p-3 rounded-4 h-100" style="background: ${isDark ? '#1e293b' : '#f1f5f9'}">
+                                        <div class="text-secondary small">直男指数</div>
+                                        <div class="display-6 fw-bold text-primary">${type.traits.straightScore}%</div>
+                                        <div class="small">${type.traits.straightComment}</div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="p-3 rounded-4 h-100" style="background: ${isDark ? '#1e293b' : '#f1f5f9'}">
+                                        <div class="text-secondary small">情商潜力</div>
+                                        <div class="display-6 fw-bold text-success">${type.traits.eqScore}%</div>
+                                        <div class="small">${type.traits.eqComment}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex flex-wrap gap-3 justify-content-center">
+                                <button id="shareBtn" class="btn btn-gradient px-4 py-2">
+                                    <i class="bi bi-download me-2"></i>保存结果卡片
+                                </button>
+                                <button id="retakeBtn" class="btn btn-outline-secondary rounded-pill px-4 py-2">
+                                    <i class="bi bi-arrow-repeat me-2"></i>重新测试
+                                </button>
+                            </div>
+                            <p class="footer-note small mt-4">* 测试结果仅供娱乐，每个直男都是潜力股。</p>
+                        </div>
+                    </div>
+                </div>
             `;
-            document.getElementById('retakeBtn').addEventListener('click', () => { currentView = 'home'; answers = {}; renderHome(); });
+
+            document.getElementById('retakeBtn').addEventListener('click', () => {
+                currentView = 'home';
+                answers = {};
+                renderHome();
+            });
+
             document.getElementById('shareBtn').addEventListener('click', async () => {
-                const btn = document.getElementById('shareBtn'); btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>生成中...'; btn.disabled = true;
+                const btn = document.getElementById('shareBtn');
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>生成中...';
+                btn.disabled = true;
                 try {
-                    const el = document.getElementById('resultCard'); el.style.background = document.body.getAttribute('data-bs-theme')==='dark'?'#192132':'#ffffff';
-                    const canvas = await html2canvas(el, { scale: 2.2, backgroundColor: document.body.getAttribute('data-bs-theme')==='dark'?'#192132':'#ffffff' });
-                    el.style.background = ''; const link = document.createElement('a'); link.download = `BoyTi-${type.code}.png`; link.href = canvas.toDataURL('image/png'); link.click();
-                    btn.innerHTML = '<i class="bi bi-check-lg me-2"></i>已保存'; setTimeout(() => { btn.innerHTML = '<i class="bi bi-download me-2"></i>保存结果卡片'; btn.disabled = false; }, 2000);
-                } catch(e) { alert('生成失败，可截图保存'); btn.innerHTML = '<i class="bi bi-download me-2"></i>保存结果卡片'; btn.disabled = false; }
+                    const el = document.getElementById('resultCard');
+                    const bgColor = document.body.getAttribute('data-bs-theme') === 'dark' ? '#192132' : '#ffffff';
+                    el.style.background = bgColor;
+                    const canvas = await html2canvas(el, { scale: 2.2, backgroundColor: bgColor });
+                    el.style.background = '';
+                    const link = document.createElement('a');
+                    link.download = `BoyTi-${type.code}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                    btn.innerHTML = '<i class="bi bi-check-lg me-2"></i>已保存';
+                    setTimeout(() => {
+                        btn.innerHTML = '<i class="bi bi-download me-2"></i>保存结果卡片';
+                        btn.disabled = false;
+                    }, 2000);
+                } catch(e) {
+                    alert('生成失败，可截图保存');
+                    btn.innerHTML = '<i class="bi bi-download me-2"></i>保存结果卡片';
+                    btn.disabled = false;
+                }
             });
         }
 
+        // 启动
         renderHome();
     })();
 </script>
